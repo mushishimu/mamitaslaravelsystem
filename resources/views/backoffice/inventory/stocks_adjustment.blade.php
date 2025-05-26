@@ -15,9 +15,9 @@
 <body class="w-full h-auto bg-[#fefefe] relative">
     {{-- modal pending items --}}
     <dialog id="stockModal" open
-        class="container fixed inset-0 z-10 bg-white pt-[50px] pb-[100px] max-h-[90vh] overflow-y-auto hidden">
-        <button id="closeModal" class="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-gray-900 p-5"
-            aria-label="Close Modal">
+        class="container fixed inset-0 z-10 bg-[#DEDEDE] pt-[50px] pb-[100px] max-h-[90vh] overflow-y-auto hidden">
+        <button id="openModal" class="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-gray-900 p-5" 
+            aria-label="openModal">
             ✖
         </button>
         <div class="container px-[30px] mx-auto space-y-[30px]">
@@ -86,11 +86,11 @@
             </div>
         </div>
     </dialog>
-
+    
     <div id="coverup" class="hidden w-full bg-main h-screen absolute z-50 opacity-30"></div>
     <form id="filterForm">
         <div id="filterModal"
-            class="hidden py-1 w-1/3 bg-[#f0f0f0] shadow-3xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 rounded-2xl">
+            class="hidden py-1 w-1/3 bg-[#f0f0f0] shadow-3xl absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 rounded-2xl">
             <div class="flex py-3 px-5 justify-between items-center">
                 <p class="font-medium">Filter Items</p>
                 <button onclick="closeFilter(event)">
@@ -265,7 +265,7 @@
                     {{-- add notifications here --}}
 
                     {{-- Notification Button --}}
-                    <a id="openModal" class="text-red-500 flex cursor-pointer" href="#">
+                    <a id="OpenModal" class="text-red-500 flex cursor-pointer" href="">
                         Pending Items
                         <div
                             class="w-[20px] h-[20px] flex items-center justify-center bg-red-500 rounded-full -translate-y-[12px]">
@@ -380,8 +380,9 @@
         <div class="bg-white w-1/3 mx-auto mt-1 rounded-lg p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">Stock Adjustment</h2>
-                <button onclick="closeAdjustmentModal()" class="text-gray-500 hover:text-gray-700">
+                <button onclick="openAdjustmentModal()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
+                    
                 </button>
             </div>
 
