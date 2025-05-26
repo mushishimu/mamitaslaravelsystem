@@ -16,8 +16,8 @@
     {{-- modal pending items --}}
     <dialog id="stockModal" open
         class="container fixed inset-0 z-10 bg-[#DEDEDE] pt-[50px] pb-[100px] max-h-[90vh] overflow-y-auto hidden">
-        <button id="openModal" class="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-gray-900 p-5" 
-            aria-label="openModal">
+        <button id="closeModal" class="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-gray-900 p-5" 
+            aria-label="closeModal">
             ✖
         </button>
         <div class="container px-[30px] mx-auto space-y-[30px]">
@@ -35,6 +35,7 @@
                         <button id="sortByQuantity"
                             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-2">Sort by
                             Quantity</button>
+                            
                     </div>
                 </div>
             </div>
@@ -46,6 +47,7 @@
                             <th scope="col" class="px-6 py-3">Status</th>
                             <th scope="col" class="px-6 py-3">Stocks</th>
                             <th scope="col" class="px-6 py-3">Expiration Date</th>
+                            
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="max-h-[calc(90vh-200px)] overflow-y-auto">
@@ -265,7 +267,7 @@
                     {{-- add notifications here --}}
 
                     {{-- Notification Button --}}
-                    <a id="OpenModal" class="text-red-500 flex cursor-pointer" href="">
+                    <a id="openModal" class="text-red-500 flex cursor-pointer" href="">
                         Pending Items
                         <div
                             class="w-[20px] h-[20px] flex items-center justify-center bg-red-500 rounded-full -translate-y-[12px]">
@@ -380,7 +382,7 @@
         <div class="bg-white w-1/3 mx-auto mt-1 rounded-lg p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">Stock Adjustment</h2>
-                <button onclick="openAdjustmentModal()" class="text-gray-500 hover:text-gray-700">
+                <button onclick="closeAdjustmentModal()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                     
                 </button>

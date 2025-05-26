@@ -349,9 +349,9 @@
             });
 
             $(document).on('keydown', function(event) {
-                if (event.key === 'End') {
-                    moneyTrans.classList.remove('hidden')
-                    coverup.classList.remove('hidden')
+                if (event.key === '=') {
+                    moneyTrans.classList.toggle('hidden')
+                    coverup.classList.toggle('hidden')
                 }
             });
 

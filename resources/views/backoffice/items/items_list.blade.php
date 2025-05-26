@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/5bf9be4e76.js" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
     @vite('resources/css/app.css')
     <title>Back Office</title>
 </head>
@@ -201,7 +202,7 @@
                     <button onclick="window.location.href='{{ route('office.create_item') }}'"
                         class="px-5 bg-[#4d4d4d] font-medium uppercase text-xs py-2 text-white">Add Item</button>
                     <div class="w-[120px] flex items-center relative">
-                        <button onclick="window.location.href='{{ route('office.pending_items') }}'"
+                        <button onclick="window.location.href='{{ route('office.pending_items')}}'"
                             class="w-full font-medium uppercase text-xs py-2 text-main">Pending Items</button>
                         <div
                             class="w-[25px] h-[25px] flex items-center justify-center rounded-full bg-main border border-white absolute -top-2 -right-2">
