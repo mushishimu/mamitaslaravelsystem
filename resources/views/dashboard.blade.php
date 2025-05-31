@@ -484,7 +484,7 @@
 
                 totalElement.text(total.toFixed(2));
                 payableElement.text(total.toFixed(2));
-                $('#proceed').text('PAY ' + total.toFixed(2));
+                $('#proceed').text('PAY' + total.toFixed(2));
                 updateProceedButtonState();
             }
 
