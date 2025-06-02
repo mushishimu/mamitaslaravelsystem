@@ -9,7 +9,7 @@
     <title>Back Office</title>
 </head>
 
-<body class="w-full h-screen bg-[#fefefe] relative">
+<body class="w-full h-auto bg-[#fefefe] relative">
     <div id="overlay" class="hidden absolute bg-[#474646] w-full h-screen top-0 left-0 z-10 opacity-90"></div>
     <div id="displayDiv"
         class="hidden w-1/2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white shadow-lg rounded-xl">
@@ -85,11 +85,6 @@
                 </a>
             </div>
             <div class="w-full relative">
-                <a href="{{ route('office.cms') }}" class="w-full flex items-center justify-center h-auto py-4">
-                    <img src="{{ asset('images/cms.png') }}" alt="" class="w-[30px] h-auto">
-                </a>
-            </div>
-            <div class="w-full relative">
                 <form id="logoutForm" action="{{ route('office.logout') }}" method="POST">
                     @csrf
                     <a href="#" id="logoutLink" class="w-full flex items-center justify-center h-auto py-4">
@@ -127,31 +122,62 @@
                     <a href="{{ route('office.new_order') }}" class=" text-main">New order</a>
                 </div>
                 <div class="flex text-md text-[#8e8f8e] border-b pb-2">
-                    <p class="w-1/6">Batch Number</p>
+                    <p class="w-1/6">Order Number</p>
                     <p class="w-1/6">Number of products</p>
-                    <p class="w-1/6">Total of items ordered</p>
+                    <p id="sortTotalHeader" class="w-1/6 cursor-pointer hover:underline flex items-center gap-1"
+                        onclick="sortByTotalItems()">
+                        Total of items ordered
+                        <span id="sortArrow">▼</span> {{-- Default to descending --}}
+                    </p>
                     <p class="w-1/6">Order Date</p>
                     <p class="w-1/6">Delivery Date</p>
                     <p class="w-1/6 text-center">Actions</p>
                 </div>
-                @foreach ($summaries as $summary)
-                    <div class="flex text-md border-b py-2 text-[#3e413f]">
-                        <p id="batchNumber" class="w-1/6 py-4">{{ $summary['batch_number'] }}</p>
-                        <p class="w-1/6 py-4">{{ $summary['total_rows'] }}</p>
-                        <p class="w-1/6 py-4">{{ $summary['total_items'] }}</p>
-                        <p class="w-1/6 py-4">{{ $summary['created_at'] }}</p>
-                        @php
-                            if ($summary['created_at'] != $summary['updated_at']) {
-                                echo '<p class="w-1/6 py-4">' . $summary['updated_at'] . '</p>';
-                            } else {
-                                echo '<p class="w-1/6 py-4">Not yet delivered</p>';
-                            }
-                        @endphp
-                        <button id="seeDetails" class="w-1/6 text-center text-main py-4">See details</button>
-                    </div>
-                @endforeach
+                <div id="summaryRows">
+                    @foreach ($summaries as $summary)
+                        <div class="flex text-md border-b py-2 text-[#3e413f] summary-row"
+                            data-total="{{ $summary['total_items'] }}">
+                            <p id="batchNumber" class="w-1/6 py-4">{{ $summary['batch_number'] }}</p>
+                            <p class="w-1/6 py-4">{{ $summary['total_rows'] }}</p>
+                            <p class="w-1/6 py-4">{{ $summary['total_items'] }}</p>
+                            <p class="w-1/6 py-4">{{ $summary['created_at'] }}</p>
+                            @php
+                                if ($summary['created_at'] != $summary['updated_at']) {
+                                    echo '<p class="w-1/6 py-4">' . $summary['updated_at'] . '</p>';
+                                } else {
+                                    echo '<p class="w-1/6 py-4">Not yet delivered</p>';
+                                }
+                            @endphp
+                            <button id="seeDetails" class="w-1/6 text-center text-main py-4">See details</button>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
+        <script>
+            let totalSortDirection = 'desc';
+
+            function sortByTotalItems() {
+                const container = document.getElementById('summaryRows');
+                const rows = Array.from(container.getElementsByClassName('summary-row'));
+
+                rows.sort((a, b) => {
+                    const totalA = parseInt(a.dataset.total);
+                    const totalB = parseInt(b.dataset.total);
+                    return totalSortDirection === 'asc' ? totalA - totalB : totalB - totalA;
+                });
+
+                // Re-append sorted rows
+                rows.forEach(row => container.appendChild(row));
+
+                // Toggle sort direction
+                totalSortDirection = totalSortDirection === 'asc' ? 'desc' : 'asc';
+
+                // Update arrow icon
+                const arrow = document.getElementById('sortArrow');
+                arrow.textContent = totalSortDirection === 'asc' ? '▲' : '▼';
+            }
+        </script>
     </div>
     <script>
         $(document).ready(function() {

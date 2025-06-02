@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="{{ asset('jquery/jquery.js') }}"></script>
     @vite('resources/css/app.css')
-    <title>Back Office</title>
+    <title>Back Office - Enhanced Ordering</title>
 </head>
 
 <body class="w-full h-screen bg-[#fefefe]">
@@ -47,11 +47,6 @@
                     </div>
                 </div>
             </div>
-            {{-- <div class="w-full relative">
-                <a href="{{route('qr_printing')}}" class="w-full flex items-center justify-center h-auto py-4">
-                    <img src="{{asset('images/qr.png')}}" alt="" class="w-[30px] h-auto">
-                </a>
-            </div> --}}
             <div class="w-full relative">
                 <a href="{{ route('office.cashiers') }}" class="w-full flex items-center justify-center h-auto py-4">
                     <img src="{{ asset('images/employee-new.png') }}" alt="" class="w-[30px] h-auto">
@@ -80,7 +75,7 @@
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
                 document.getElementById('logoutLink').addEventListener('click', function(e) {
-                    e.preventDefault(); // Prevent the default link action
+                    e.preventDefault();
 
                     Swal.fire({
                         title: "Are you sure?",
@@ -92,7 +87,6 @@
                         confirmButtonText: "Yes, log me out!"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Submit the logout form
                             document.getElementById('logoutForm').submit();
                         }
                     });
@@ -100,233 +94,450 @@
             </script>
         </div>
         <div id="main" class="w-[95%] bg-[#f2f2f2] grid grid-cols-2 gap-6 grid-rows-2 p-7">
-            <div class="w-full bg-white rounded-xl py-3 px-5">
-                <p class="py-1 font-medium border-b-2 border-[#565857] text-[#565857]">Item to order</p>
-                <div class="pt-2">
-                    <input id="item_search" type="search" name="item_name" placeholder="Search for item name"
-                        autocomplete="off"
-                        class="w-full px-5 py-2 rounded-lg outline-none border border-[#565857] focus:border-main">
-                    <p>Result:</p>
-                    <div id="item_result" class="w-full h-[90px] overflow-y-auto pb-2 border-b">
 
+            <div class="w-full bg-white rounded-xl py-3 px-5">
+                <p class="py-1 font-medium border-b-2 border-[#565857] text-[#565857]">Supplier Selection</p>
+                <div class="pt-2 mb-4">
+                    <input id="supplier_search" autocomplete="off" type="search" name="supplier_name"
+                        placeholder="Search for supplier name"
+                        class="w-full px-5 py-2 rounded-lg outline-none border border-[#565857] focus:border-[#db121c]">
+                    <p class="mt-2 text-sm text-gray-600">Available Suppliers:</p>
+                    <div id="supplier_result" class="w-full max-h-[120px] overflow-y-auto pb-2 border-b">
+                        <!-- Suppliers will be populated here -->
                     </div>
-                    <div class="w-full flex py-2">
-                        <div class="w-[70%] flex flex-col gap-2">
-                            <p class="w-full" id="product_name">Name</p>
-                            <p class="w-full font-medium" id="name_input"></p>
-                        </div>
-                        <div class="w-[30%] flex flex-col gap-2">
-                            <p class="w-full">Quantity</p>
-                            <input id="quantity" type="number" name="quantity"
-                                class="w-full px-5 py-2 border-b border-[#565857] outline-none focus:border-main">
-                        </div>
+                    <div class="w-full flex gap-1 pt-3">
+                        <p id="selected_supplier_label">Selected supplier:</p>
+                        <p class="font-medium text-[#db121c]" id="supplier_input">None selected</p>
                     </div>
                 </div>
             </div>
+
             <div class="w-full col-start-2 row-span-2 bg-white rounded-xl py-3 px-5">
-                <div class="flex justify-between border-b-2 border-[#565857]">
-                    <p class="py-1 font-medium text-[#565857]">Batch Order # {{ $newBn }}</p>
+                <div class="flex justify-between border-b-2 border-[#565857] pb-2">
+                    <p class="py-1 font-medium text-[#565857]">Order # {{ $newBn ?? '12345' }}</p>
                     <form action="{{ route('office.place_order') }}" method="POST">
                         @csrf
                         <div id="form_div">
-
+                            <!-- Hidden inputs for form submission -->
                         </div>
-                        <input type="hidden" name="batch_number" value="{{ $newBn }}">
-                        <button class="text-main">
+                        <input type="hidden" name="batch_number" value="{{ $newBn ?? '12345' }}">
+                        <button class="text-[#db121c] font-medium hover:underline" type="submit">
                             Complete this order
                         </button>
                     </form>
                 </div>
-                <div class="w-full pt-2" id="res_div">
 
+                <!-- Order Summary Header -->
+                <div class="w-full flex items-center text-sm font-medium py-2 border-b text-gray-600">
+                    <p class="w-2/5">Item Name</p>
+                    <p class="w-2/5">Supplier</p>
+                    <p class="w-1/5">Quantity</p>
+                </div>
+
+                <!-- Order Items List -->
+                <div class="w-full pt-2 max-h-[400px] overflow-y-auto" id="order_items_list">
+                    <p class="text-gray-500 text-center py-8">No items added to order yet</p>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="border-t pt-3 mt-3">
+                    <div class="flex justify-between items-center">
+                        <p class="font-medium">Total Items: <span id="total_items_count">0</span></p>
+                        <button id="clear_order" class="text-red-500 text-sm hover:underline">Clear All</button>
+                    </div>
                 </div>
             </div>
-            <div class="w-full bg-white rounded-xl py-3 px-5">
-                <p class="py-1 font-medium border-b-2 border-[#565857] text-[#565857]">Supplier details</p>
-                <div class="pt-2 mb-4">
-                    <input id="supplier_search" autocomplete="off" type="search" name="supplier_name"
-                        placeholder="Search for supplier name"
-                        class="w-full px-5 py-2 rounded-lg outline-none border border-[#565857] focus:border-main">
-                    <p>Result:</p>
-                    <div id="supplier_result" class="w-full h-[70px] pb-2 border-b">
 
+            <div class="w-full bg-white rounded-xl py-3 px-5">
+                <p class="py-1 font-medium border-b-2 border-[#565857] text-[#565857]">Available Items from Selected
+                    Supplier</p>
+                <div class="pt-2">
+                    <!-- Search within supplier items -->
+                    <input id="item_search" type="search" name="item_name"
+                        placeholder="Search items from selected supplier" autocomplete="off" disabled
+                        class="w-full px-5 py-2 rounded-lg outline-none border border-[#565857] focus:border-[#db121c] disabled:bg-gray-100">
+
+                    <p class="mt-2 text-sm text-gray-600">Items:</p>
+                    <div id="supplier_items_list" class="w-full max-h-[200px] overflow-y-auto pb-2 border-b">
+                        <p class="text-gray-500 text-center py-4">Please select a supplier first</p>
                     </div>
-                    <div class="w-full flex gap-1 pt-3">
-                        <p id="selected supplier">Selected supplier:</p>
-                        <p class="font-medium" id="supplier_input">Supplier</p>
+
+                    <!-- Selected Item Details -->
+                    <div class="w-full flex py-2 mt-3" id="item_selection_area" style="display: none;">
+                        <div class="w-[60%] flex flex-col gap-2">
+                            <p class="w-full font-medium">Selected Item:</p>
+                            <p class="w-full text-[#db121c]" id="selected_item_name">None</p>
+                        </div>
+                        <div class="w-[40%] flex flex-col gap-2">
+                            <p class="w-full font-medium">Quantity:</p>
+                            <div class="flex items-center gap-2">
+                                <input id="quantity_input" type="number" min="1" value="1"
+                                    class="w-full px-3 py-2 border border-[#565857] rounded outline-none focus:border-[#db121c]">
+                                <button id="add_item_to_order"
+                                    class="px-4 py-2 bg-[#db121c] text-white rounded hover:bg-red-700 transition-colors">
+                                    Add
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {{-- <form action="" method="POST"> --}}
-                {{-- @csrf --}}
-                <input id="item_name_submit" type="hidden" name="item_name" value="">
-                <input id="supplier_name_submit" type="hidden" name="supplier_name" value="">
-                <input id="item_quantity_submit" type="hidden" name="item_quantity" value="">
-                {{-- <input id="batch_number" type="hidden" name="batch_number" value="{{$newBn}}"> --}}
-                <button id="add_to_order" type="submit"
-                    class="w-full py-2 rounded-lg border-2 border-main text-main">Add to Order</button>
-                {{-- </form> --}}
             </div>
         </div>
     </div>
+   
+
     <script>
         $(document).ready(function() {
-            var food_name = ''
-            var supplier_name = ''
-            var itemQuantity = 0
-            $('#quantity').on('keyup', function() {
-                itemQuantity = $(this).val()
-                $('#item_quantity_submit').val(itemQuantity)
-            })
+            // Global variables
+            let selectedSupplier = '';
+            let selectedItem = '';
+            let orderItems = [];
+            let orderCounter = 0;
+            let supplierItems = []; // Store items for the selected supplier
 
-            $('#item_search').on('keyup', function() {
-                var item_key = $(this).val()
-                product_name = $(this).val()
-                // console.log(key)
-                var item_url = "{{ route('office.item_search', ['key' => ':key']) }}"
-                item_url = item_url.replace(':key', item_key)
-
+            // Load all suppliers on page load
+            function loadAllSuppliers() {
                 $.ajax({
-                    url: item_url,
+                    url: "{{ route('office.supplier_search', ['key' => '']) }}",
                     method: 'GET',
                     success: function(response) {
-                        var itemDiv = $('#item_result');
-                        itemDiv.empty(); // Clear the current contents
-
-                        response.items.forEach(function(item) {
-                            var menuButton = `
-                                <button class="w-full py-2 border-b-2 hover-[#565857] item-btn" data-food-name="${item.item}">
-                                    <p>${item.item}</p>
-                                </button>
-                            `;
-                            itemDiv.append(menuButton);
-                        });
-
-                        // Use event delegation to handle click events on dynamically added buttons
-                        $('#item_result').on('click', '.item-btn', function() {
-                            let foodName = $(this).data('food-name');
-
-                            if (foodName) {
-                                food_name = foodName
-                                $('#name_input').text(foodName);
-                                $('#item_name_submit').val(foodName)
-                            } else {
-                                console.log('Invalid item data:', foodName);
-                            }
-                        });
+                        displaySuppliers(response.items);
                     },
                     error: function(xhr, status, error) {
-                        console.error(xhr, status, error);
+                        console.error('Error loading suppliers:', error);
+                        $('#supplier_result').html(
+                            '<p class="text-red-500 text-center py-4">Error loading suppliers</p>');
                     }
                 });
-            })
+            }
 
+            // Display suppliers in the UI
+            function displaySuppliers(suppliers) {
+                const supplierDiv = $('#supplier_result');
+                supplierDiv.empty();
+
+                if (!suppliers || suppliers.length === 0) {
+                    supplierDiv.append('<p class="text-gray-500 text-center py-4">No suppliers found</p>');
+                    return;
+                }
+
+                suppliers.forEach(function(supplier) {
+                    const supplierButton = `
+                        <button class="w-full py-2 px-3 text-left border-b hover:bg-gray-50 supplier-btn transition-colors" 
+                                data-supplier-id="${supplier.id}" data-supplier-name="${supplier.name}">
+                            <p class="font-medium">${supplier.name}</p>
+                        </button>
+                    `;
+                    supplierDiv.append(supplierButton);
+                });
+            }
+
+            // Load suppliers on page load
+            loadAllSuppliers();
+
+            // Supplier search functionality
             $('#supplier_search').on('keyup', function() {
-                var supplier_key = $(this).val()
+                const searchKey = $(this).val();
 
-                // console.log(key)
-                var supplier_url = "{{ route('office.supplier_search', ['key' => ':key']) }}"
-                supplier_url = supplier_url.replace(':key', supplier_key)
-                console.log(supplier_url)
+                if (searchKey.length === 0) {
+                    loadAllSuppliers();
+                    return;
+                }
+
+                const supplier_url = "{{ route('office.supplier_search', ['key' => ':key']) }}";
+                const finalUrl = supplier_url.replace(':key', searchKey);
 
                 $.ajax({
-                    url: supplier_url,
+                    url: finalUrl,
                     method: 'GET',
                     success: function(response) {
-                        var supplierDiv = $('#supplier_result');
-                        supplierDiv.empty(); // Clear the current contents
-
-                        response.items.forEach(function(item) {
-                            var menuButton = `
-                                <button class="w-full py-2 border-b-2 hover-[#565857] supplier-btn" data-supplier-name="${item.name}">
-                                    <p>${item.name}</p>
-                                </button>
-                            `;
-                            supplierDiv.append(menuButton);
-                        });
-
-                        // Use event delegation to handle click events on dynamically added buttons
-                        $('#supplier_result').on('click', '.supplier-btn', function() {
-                            let supplierName = $(this).data('supplier-name');
-
-                            if (supplierName) {
-                                supplier_name = supplierName
-                                $('#supplier_input').text(supplierName);
-                                $('#supplier_name_submit').val(supplierName)
-                            } else {
-                                console.log('Invalid item data:', supplierName);
-                            }
-                        });
+                        displaySuppliers(response.items);
                     },
                     error: function(xhr, status, error) {
-                        console.error(xhr, status, error);
+                        console.error('Error searching suppliers:', error);
+                        $('#supplier_result').html(
+                            '<p class="text-red-500 text-center py-4">Error searching suppliers</p>'
+                        );
                     }
                 });
-            })
-            $('#add_to_order').on('click', function() {
-                console.log('Product Name:', food_name);
-                console.log('Supplier:', supplier_name);
-                console.log('Quantity:', itemQuantity);
-                // Add your logic here to handle the order
-
-                var results = $('#res_div')
-                var formDiv = $('#form_div')
-
-                results.append(`
-                    <div class="w-full flex items-center text-sm py-1 border-b">
-                        <p class="w-2/5" id="item_res">${food_name}</p>
-                        <p class="w-2/5" id="item_supplier">${supplier_name}</p>
-                        <p class="w-1/5" id="item_quantity">${itemQuantity}</p>
-                    </div> 
-                `)
-
-                formDiv.append(`
-                    <div>
-                        <input type="hidden" name="food_name[]" value="${food_name}">
-                        <input type="hidden" name="suppliername[]" value="${supplier_name}">
-                        <input type="hidden" name="quantity[]" value="${itemQuantity}">
-                    </div> 
-                `)
             });
-        })
 
+            // Handle supplier selection
+            $(document).on('click', '.supplier-btn', function() {
+                const supplierId = $(this).data('supplier-id');
+                const supplierName = $(this).data('supplier-name');
 
+                selectedSupplier = {
+                    id: supplierId,
+                    name: supplierName
+                };
 
-        var main = document.getElementById('main')
+                $('#supplier_input').text(supplierName);
 
+                // Load items for selected supplier
+                loadSupplierItems(supplierId, supplierName);
+
+                // Enable item search
+                $('#item_search').prop('disabled', false);
+
+                // Highlight selected supplier
+                $('.supplier-btn').removeClass('bg-blue-50 border-blue-200');
+                $(this).addClass('bg-blue-50 border-blue-200');
+            });
+
+            // Load items for selected supplier from database
+            function loadSupplierItems(supplierId, supplierName) {
+                const itemsDiv = $('#supplier_items_list');
+                itemsDiv.html('<p class="text-gray-500 text-center py-4">Loading items...</p>');
+
+                $.ajax({
+                    url: "{{ route('office.items_by_supplier') }}",
+                    method: 'GET',
+                    data: {
+                        supplier_id: supplierId
+                    },
+                    success: function(response) {
+                        if (response.success && response.items) {
+                            supplierItems = response.items;
+                            displaySupplierItems(supplierItems);
+                        } else {
+                            itemsDiv.html(
+                                '<p class="text-red-500 text-center py-4">No items found for this supplier</p>'
+                            );
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'Error loading items';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        itemsDiv.html(`<p class="text-red-500 text-center py-4">${errorMessage}</p>`);
+                        console.error('Error details:', xhr.responseText);
+                    }
+                });
+            }
+            // Display items for selected supplier
+            function displaySupplierItems(items) {
+                const itemsDiv = $('#supplier_items_list');
+                itemsDiv.empty();
+
+                if (!items || items.length === 0) {
+                    itemsDiv.append(
+                        '<p class="text-gray-500 text-center py-4">No items available for this supplier</p>');
+                    return;
+                }
+
+                items.forEach(function(item) {
+                    const itemButton = `
+                        <button class="w-full py-2 px-3 text-left border-b hover:bg-gray-50 item-btn transition-colors" 
+                                data-item-id="${item.id || ''}" data-item-name="${item.item}" data-item-price="${item.price || 0}">
+                            <div class="flex justify-between items-center">
+                                <p class="font-medium">${item.item}</p>
+                                ${item.price ? `<p class="text-sm text-gray-600">₱${item.price}</p>` : ''}
+                            </div>
+                        </button>
+                    `;
+                    itemsDiv.append(itemButton);
+                });
+            }
+
+            // Item search within supplier items (client-side filtering)
+            $('#item_search').on('keyup', function() {
+                if (!selectedSupplier.id) return;
+
+                const searchKey = $(this).val().toLowerCase();
+
+                if (searchKey.length === 0) {
+                    // Show all items when search is empty
+                    displaySupplierItems(supplierItems);
+                    return;
+                }
+
+                // Filter items client-side from the stored supplierItems
+                const filteredItems = supplierItems.filter(item =>
+                    item.item.toLowerCase().includes(searchKey)
+                );
+
+                displaySupplierItems(filteredItems);
+            });
+
+            // Handle item selection
+            $(document).on('click', '.item-btn', function() {
+                const itemId = $(this).data('item-id');
+                const itemName = $(this).data('item-name');
+                const itemPrice = $(this).data('item-price') || 0;
+
+                selectedItem = {
+                    id: itemId,
+                    name: itemName,
+                    price: itemPrice
+                };
+
+                $('#selected_item_name').text(itemName);
+                $('#item_selection_area').show();
+
+                // Highlight selected item
+                $('.item-btn').removeClass('bg-green-50 border-green-200');
+                $(this).addClass('bg-green-50 border-green-200');
+            });
+
+            // Add item to order
+            $('#add_item_to_order').on('click', function() {
+                if (!selectedSupplier.name || !selectedItem.name) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Please select both supplier and item',
+                        icon: 'error'
+                    });
+                    return;
+                }
+
+                const quantity = parseInt($('#quantity_input').val()) || 1;
+
+                if (quantity < 1) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Quantity must be at least 1',
+                        icon: 'error'
+                    });
+                    return;
+                }
+
+                // Check if item already exists in order
+                const existingItemIndex = orderItems.findIndex(item =>
+                    item.itemId === selectedItem.id && item.supplierId === selectedSupplier.id
+                );
+
+                if (existingItemIndex !== -1) {
+                    // Update existing item quantity
+                    orderItems[existingItemIndex].quantity += quantity;
+                } else {
+                    // Add new item to order
+                    orderItems.push({
+                        id: ++orderCounter,
+                        itemId: selectedItem.id,
+                        itemName: selectedItem.name,
+                        supplierId: selectedSupplier.id,
+                        supplierName: selectedSupplier.name,
+                        quantity: quantity,
+                        price: selectedItem.price
+                    });
+                }
+
+                updateOrderDisplay();
+                updateFormInputs();
+
+                // Reset item selection
+                $('#quantity_input').val(1);
+                $('#selected_item_name').text('None');
+                $('#item_selection_area').hide();
+                $('.item-btn').removeClass('bg-green-50 border-green-200');
+                selectedItem = '';
+
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Item added to order',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            });
+
+            // Update order display
+            function updateOrderDisplay() {
+                const orderDiv = $('#order_items_list');
+                orderDiv.empty();
+
+                if (orderItems.length === 0) {
+                    orderDiv.append('<p class="text-gray-500 text-center py-8">No items added to order yet</p>');
+                    $('#total_items_count').text('0');
+                    return;
+                }
+
+                orderItems.forEach(function(item) {
+                    const orderItemDiv = `
+                        <div class="w-full flex items-center text-sm py-3 border-b hover:bg-gray-50" data-order-id="${item.id}">
+                            <div class="w-2/5">
+                                <p class="font-medium">${item.itemName}</p>
+                                ${item.price > 0 ? `<p class="text-xs text-gray-500">₱${item.price} each</p>` : ''}
+                            </div>
+                            <div class="w-2/5">
+                                <p>${item.supplierName}</p>
+                            </div>
+                            <div class="w-1/5 flex items-center justify-between">
+                                <p class="font-medium">${item.quantity}</p>
+                                <button class="text-red-500 hover:text-red-700 remove-item-btn" data-order-id="${item.id}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    orderDiv.append(orderItemDiv);
+                });
+
+                $('#total_items_count').text(orderItems.length);
+            }
+
+            // Remove item from order
+            $(document).on('click', '.remove-item-btn', function() {
+                const orderId = parseInt($(this).data('order-id'));
+                orderItems = orderItems.filter(item => item.id !== orderId);
+                updateOrderDisplay();
+                updateFormInputs();
+            });
+
+            // Clear all items
+            $('#clear_order').on('click', function() {
+                if (orderItems.length === 0) return;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This will remove all items from the order',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, clear all'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        orderItems = [];
+                        updateOrderDisplay();
+                        updateFormInputs();
+                    }
+                });
+            });
+
+            // Update form inputs for submission
+            function updateFormInputs() {
+                const formDiv = $('#form_div');
+                formDiv.empty();
+
+                orderItems.forEach(function(item) {
+                    const hiddenInputs = `
+                        <div>
+                            <input type="hidden" name="food_name[]" value="${item.itemName}">
+                            <input type="hidden" name="suppliername[]" value="${item.supplierName}">
+                            <input type="hidden" name="quantity[]" value="${item.quantity}">
+                            <input type="hidden" name="item_id[]" value="${item.itemId}">
+                            <input type="hidden" name="supplier_id[]" value="${item.supplierId}">
+                        </div>
+                    `;
+                    formDiv.append(hiddenInputs);
+                });
+            }
+        });
+
+        // Sidebar functions
         function openInventoryOptions() {
-            var inventoryOptions = document.getElementById('inventory_options')
-            inventoryOptions.classList.toggle('hidden')
-            main.classList.toggle('blur-5px')
+            var inventoryOptions = document.getElementById('inventory_options');
+            inventoryOptions.classList.toggle('hidden');
         }
 
         function openDashboard() {
-            var inventoryOptions = document.getElementById('dash_options')
-            inventoryOptions.classList.toggle('hidden')
-            main.classList.toggle('blur-5px')
-        }
-
-        function openItems() {
-            var inventoryOptions = document.getElementById('items_options')
-            inventoryOptions.classList.toggle('hidden')
-            main.classList.toggle('blur-5px')
-        }
-
-        function openAddCashier() {
-            var addModal = document.getElementById('add')
-            var head = document.getElementById('head')
-            var body = document.getElementById('body')
-            addModal.classList.remove('hidden')
-            head.style.filter = 'blur(5px)'
-            body.style.filter = 'blur(5px)'
-        }
-
-        function closeCashierModal() {
-            var addModal = document.getElementById('add')
-            var head = document.getElementById('head')
-            var body = document.getElementById('body')
-            addModal.classList.add('hidden')
-            head.style.filter = 'blur(0)'
-            body.style.filter = 'blur(0)'
+            var dashOptions = document.getElementById('dash_options');
+            dashOptions.classList.toggle('hidden');
         }
     </script>
 </body>

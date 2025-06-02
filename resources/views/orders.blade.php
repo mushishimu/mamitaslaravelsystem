@@ -37,10 +37,10 @@
                 <img src="{{ asset('images/history-new.png') }}" alt="Cashier Icon" class="w-1/3">
                 <p class="text-xs text-[#565857]">History</p>
             </a>
-            <a href="{{ route('inventory') }}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
+            {{-- <a href="{{ route('inventory') }}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{ asset('images/inv-new.png') }}" alt="Cashier Icon" class="w-1/3">
                 <p class="text-xs text-[#565857]">Inventory</p>
-            </a>
+            </a> --}}
             <a href="{{ route('orders') }}"
                 class="flex w-2/3 mx-auto flex-col items-center justify-center py-4 rounded-xl bg-[#f5a7a4]">
                 <img src="{{ asset('images/order-red.png') }}" alt="Cashier Icon" class="w-1/3">
@@ -56,7 +56,7 @@
         <div class="w-[94%] h-full grid grid-cols-2 grid-rows-12 gap-6 bg-[#e4e4e4] p-6">
             {{-- selection --}}
             <div class="w-full flex items-center justify-between h-full col-span-2 row-span-2 bg-white rounded-xl p-4">
-                <p class="text-lg font-semibold">Orders list</p>
+                <p class="text-lg font-semibold uppercase">Orders list</p>
                 <div>
                     <button id="submitSelected"
                         class="py-2 rounded-lg border border-main text-main text-sm px-4">Complete Order</button>
@@ -70,11 +70,11 @@
                             class="w-full flex justify-between p-6 rounded-lg shadow-md mb-2 border border-[#565857] supp-btn"
                             data-batch="{{ $batch['batch_number'] }}">
                             <div class="w-1/3 flex gap-2">
-                                <p>Batch Number:</p>
+                                <p>Order Number:</p>
                                 <p>{{ $batch['batch_number'] }}</p>
                             </div>
                             <div class="w-1/3 flex gap-2">
-                                <p>Number of orders:</p>
+                                <p>Order List Number:</p>
                                 <p>{{ $batch['total_rows'] }}</p>
                             </div>
                             <div class="w-1/3 flex gap-2">
@@ -88,7 +88,7 @@
             <div class="col-start-2 row-span-10 bg-white rounded-xl h-full p-4">
                 <p class="pb-2 border-b border-[#565857] font-medium text-[#565857]">Order details</p>
                 <div class="w-full h-full">
-                    <p class="py-6 font-semibold text-xl text-main">Batch # <span id="supplier_name"></span></p>
+                    <p class="py-6 font-semibold text-xl text-main">Order Number: <span id="supplier_name"></span></p>
                     <div class="w-full flex items-center border-b pb-2 pl-8">
                         <p class="w-[30%]">Item Name</p>
                         <p class="w-[15%]">Quantity</p>

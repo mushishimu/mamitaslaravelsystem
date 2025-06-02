@@ -9,16 +9,6 @@
 </head>
 
 <body class="flex flex-col gap-5 items-center justify-center relative h-screen bg-[#7e817f]">
-    @if (session()->has('error'))
-        <div class="w-1/2 bg-[#d14646] p-4 flex items-center gap-4 rounded-md">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14"
-                fill="white"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                <path
-                    d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z" />
-            </svg>
-            <p class="text-white">{{ session('error') }}</p>
-        </div>
-    @endif
     <div
         class="w-3/4 h-[80%] flex p-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#fefef8] rounded-3xl shadow-md backdrop-blur-sm border border-opacity-20">
         <div class="w-[60%] relative">
@@ -26,6 +16,16 @@
                 class="w-[80%] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         </div>
         <div class="w-[40%] flex flex-col justify-center">
+            @if ($errors->has('error'))
+                <div class="w-full bg-[#d14646] px-4 py-2 flex items-center gap-4 rounded-md mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14"
+                        fill="red"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                        <path
+                            d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z" />
+                    </svg>
+                    <p class="text-white">{{ $errors->first('error') }}</p>
+                </div>
+            @endif
             <div class="flex justify-between">
                 <p class="text-2xl font-semibold mb-4 text-[#3f3f3f]">Login your Admin Account</p>
                 <a href="{{ route('welcome') }}" class="text-main underline">Login as

@@ -47,7 +47,7 @@
             </div>
             <div href="{{route('dashboard')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{asset('images/products-new.png')}}" alt="Home Icon" class="w-1/3">
-                <p class="text-xs text-[#565857]">Home</p>
+                <a href="/dashboard" class="text-xs text-[#565857]">Home</a>
             </div>
             <div href="{{route('cashier')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4 rounded-xl bg-[#f5a7a4]">
                 <img src="{{asset('images/cashier-red.png')}}" alt="Cashier Icon" class="w-1/3">
@@ -55,19 +55,19 @@
             </div>
             <div href="{{route('history')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{asset('images/history-new.png')}}" alt="Cashier Icon" class="w-1/3">
-                <p class="text-xs text-[#565857]">History</p>
+                <a href="/history" class="text-xs text-[#565857]">History</a>
             </div>
-            <div href="{{route('inventory')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
+            {{-- <div href="{{route('inventory')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{asset('images/inv-new.png')}}" alt="Cashier Icon" class="w-1/3">
                 <p class="text-xs text-[#565857]">Inventory</p>
-            </div>
+            </div> --}}
             <div href="{{route('orders')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{asset('images/order-new.png')}}" alt="Cashier Icon" class="w-1/3">
-                <p class="text-xs text-[#565857]">Orders</p>
+                <a href="/orders" class="text-xs text-[#565857]">Orders</a>
             </div>
             <div href="{{route('office.login')}}" target="__blank" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{asset('images/backoffice-new.png')}}" alt="Cashier Icon" class="w-1/3">
-                <p class="text-xs text-[#565857]">Office</p>
+                <a href="/back-office/dashboard" class="text-xs text-[#565857]">Office</a>
             </div>
         </div>
         {{-- POS --}}
@@ -100,64 +100,64 @@
                                 <th class="text-sm">Charge</th>
                             </tr>
                             <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">1-100</td>
-                                <td class="border-r border-black">1</td>
-                                <td class="border-r border-black">1001-1100</td>
-                                <td>11</td>
-                            </tr>
-                            <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">101-200</td>
-                                <td class="border-r border-black">2</td>
-                                <td class="border-r border-black">1101-1200</td>
-                                <td>12</td>
-                            </tr>
-                            <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">201-300</td>
-                                <td class="border-r border-black">3</td>
-                                <td class="border-r border-black">1201-1300</td>
-                                <td>13</td>
-                            </tr>
-                            <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">301-400</td>
-                                <td class="border-r border-black">4</td>
-                                <td class="border-r border-black">1301-1400</td>
-                                <td>14</td>
-                            </tr>
-                            <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">401-500</td>
-                                <td class="border-r border-black">5</td>
-                                <td class="border-r border-black">1401-1500</td>
-                                <td>15</td>
-                            </tr>
-                            <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">501-600</td>
-                                <td class="border-r border-black">6</td>
-                                <td class="border-r border-black">1501-1600</td>
-                                <td>16</td>
-                            </tr>
-                            <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">601-700</td>
-                                <td class="border-r border-black">7</td>
-                                <td class="border-r border-black">1601-1700</td>
-                                <td>17</td>
-                            </tr>
-                            <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">701-800</td>
-                                <td class="border-r border-black">8</td>
-                                <td class="border-r border-black">1701-1800</td>
-                                <td>18</td>
-                            </tr>
-                            <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">801-900</td>
-                                <td class="border-r border-black">9</td>
-                                <td class="border-r border-black">1801-1900</td>
-                                <td>19</td>
-                            </tr>
-                            <tr class="w-full text-center border border-black">
-                                <td class="py-1 border-r border-black">901-1000</td>
+                                <td class="py-1 border-r border-black">1-500</td>
                                 <td class="border-r border-black">10</td>
-                                <td class="border-r border-black">1901-2000</td>
-                                <td>20</td>
+                                <td class="border-r border-black">5001-5500</td>
+                                <td>110</td>
+                            </tr>
+                            <tr class="w-full text-center border border-black">
+                                <td class="py-1 border-r border-black">501-1000</td>
+                                <td class="border-r border-black">20</td>
+                                <td class="border-r border-black">5601-6000</td>
+                                <td>120</td>
+                            </tr>
+                            <tr class="w-full text-center border border-black">
+                                <td class="py-1 border-r border-black">1001-1500</td>
+                                <td class="border-r border-black">30</td>
+                                <td class="border-r border-black">6001-6500</td>
+                                <td>130</td>
+                            </tr>
+                            <tr class="w-full text-center border border-black">
+                                <td class="py-1 border-r border-black">1501-2000</td>
+                                <td class="border-r border-black">40</td>
+                                <td class="border-r border-black">6501-7000</td>
+                                <td>140</td>
+                            </tr>
+                            <tr class="w-full text-center border border-black">
+                                <td class="py-1 border-r border-black">2001-2500</td>
+                                <td class="border-r border-black">50</td>
+                                <td class="border-r border-black">7001-7500</td>
+                                <td>150</td>
+                            </tr>
+                            <tr class="w-full text-center border border-black">
+                                <td class="py-1 border-r border-black">2501-3000</td>
+                                <td class="border-r border-black">60</td>
+                                <td class="border-r border-black">7501-8000</td>
+                                <td>160</td>
+                            </tr>
+                            <tr class="w-full text-center border border-black">
+                                <td class="py-1 border-r border-black">3001-3500</td>
+                                <td class="border-r border-black">70</td>
+                                <td class="border-r border-black">8001-8500</td>
+                                <td>170</td>
+                            </tr>
+                            <tr class="w-full text-center border border-black">
+                                <td class="py-1 border-r border-black">3501-4000</td>
+                                <td class="border-r border-black">80</td>
+                                <td class="border-r border-black">8501-9000</td>
+                                <td>180</td>
+                            </tr>
+                            <tr class="w-full text-center border border-black">
+                                <td class="py-1 border-r border-black">4001-4500</td>
+                                <td class="border-r border-black">90</td>
+                                <td class="border-r border-black">9001-9500</td>
+                                <td>190</td>
+                            </tr>
+                            <tr class="w-full text-center border border-black">
+                                <td class="py-1 border-r border-black">4501-5000</td>
+                                <td class="border-r border-black">100</td>
+                                <td class="border-r border-black">9501-10000</td>
+                                <td>200</td>
                             </tr>
                         </table>
                     </div>

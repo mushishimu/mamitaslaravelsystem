@@ -19,7 +19,7 @@
     <div class="w-full h-[93%] flex z-0">
         <div class="w-[5%] pt-10 bg-[#fefefe] mb-10">
             <div class="flex w-2/3 mx-auto flex-col items-center justify-center pb-4 mb-3">
-                    <img src="{{ asset('images/logo-transparent.png') }}" alt="">
+                <img src="{{ asset('images/logo-transparent.png') }}" alt="">
             </div>
             <div class="w-full relative">
                 <button onclick="openDashboard()" class="w-full flex items-center justify-center h-auto py-4">
@@ -153,21 +153,24 @@
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Item Name</label>
                                 <input type="text" name="item_name" value="{{ $item->item }}"
-                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main" required>
+                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
+                                    required>
                             </div>
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Quantity</label>
                                 <input type="text" name="item_quantity" value="{{ $item->quantity }}"
-                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main" recquired>
+                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
+                                    recquired>
                             </div>
-                          
+
                         </div>
                         <div class="w-full flex items-center justify-between gap-5 mb-10">
-                           
+
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Select Category</label>
                                 <select name="category" id=""
-                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main" required>
+                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
+                                    required>
                                     <option value="{{ $item->category }}" selected>{{ $item->category }}</option>
                                     <option value="Dry Goods">Dry Goods</option>
                                     <option value="Wet Goods">Wet Goods</option>
@@ -178,20 +181,17 @@
 
                             <div class="w-1/2">
                                 <label for="expiration_date">Expiration Date</label>
-                                <input 
-                                    type="date" 
-                                    name="expiration_date" 
-                                    id="expiration_date" 
+                                <input type="date" name="expiration_date" id="expiration_date"
                                     class="w-full rounded-xl outline-none border border-[#bebebe] focus:border focus:border-main px-4 py-2 mb-3"
                                     min="{{ date('Y-m-d') }}"
-                                    value="{{ $item->expiration_date ? date('Y-m-d', strtotime($item->expiration_date)) : '' }}"
-                                >
+                                    value="{{ $item->expiration_date ? date('Y-m-d', strtotime($item->expiration_date)) : '' }}">
                             </div>
                         </div>
                         <div class="w-full mb-10">
                             <label for="" class="text-gray-500">Supplier</label>
                             <select name="supplier"
-                                class="w-full mt-1 p-2 border border-[#eaeaea] focus:border-main outline-none rounded-md" required>
+                                class="w-full mt-1 p-2 border border-[#eaeaea] focus:border-main outline-none rounded-md"
+                                required>
                                 <option value="{{ $item->supplier }}" selected>{{ $item->supplier }}</option>
                                 @foreach ($suppliers as $supplier)
                                     <option value="{{ $supplier->name }}">{{ $supplier->name }}</option>
@@ -238,7 +238,8 @@
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Product unit</label>
                                 <select name="product_unit"
-                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main" required>
+                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
+                                    required>
                                     <option value="pc">Per pc</option>
                                     <option value="kg">Per kg</option>
                                     <option value="pack">Per pack</option>
@@ -257,18 +258,20 @@
                         <div class="w-full flex items-center justify-between gap-16 mb-10">
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Purchase Cost</label>
-                                <input type="number" name="cost" value="{{ $item->cost }}"
-                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main" required>
+                                <input type="number" id="cost" name="cost" value="{{ $item->cost }}"
+                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
+                                    required>
                             </div>
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Retail Value</label>
-                                <input type="number" name="retail" value="{{ $item->retail }}"
-                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main" required>
+                                <input type="number" id="retail" name="retail" value="{{ $item->retail }}"
+                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
+                                    required>
                             </div>
                         </div>
                         <div class="w-full gap-16">
                             <div class="w-full flex gap-5 items-center justify-end">
-                                <button
+                                <button id="submitButton"
                                     class="w-[100px] bg-main rounded-sm py-2 shadow-md font-medium text-white">Save</button>
                             </div>
                         </div>
@@ -277,6 +280,49 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('submitButton').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const itemName = document.querySelector('input[name="item_name"]').value.trim();
+            const purchaseCost = parseFloat(document.querySelector('input[name="cost"]').value);
+            const retailValue = parseFloat(document.querySelector('input[name="retail"]').value);
+            const errorMessages = [];
+
+            // Required field validation
+            if (!itemName) {
+                errorMessages.push("Item Name is required.");
+            }
+
+            // Business logic validation
+            if (!isNaN(purchaseCost) && !isNaN(retailValue) && purchaseCost > retailValue) {
+                errorMessages.push("Purchase Cost should not be higher than Retail Value.");
+            }
+
+            // If any errors, show them with Swal
+            if (errorMessages.length > 0) {
+                Swal.fire({
+                    title: "Error!",
+                    html: errorMessages.join("<br>"), // line break for each error
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                });
+                return;
+            }
+
+            // Show success alert and then submit the form
+            Swal.fire({
+                title: "Success!",
+                text: "Your item has been added successfully.",
+                icon: "success",
+                confirmButtonColor: "#3085d6",
+            }).then(() => {
+                document.getElementById('itemForm').submit();
+            });
+        });
+    </script>
 
     @if (session('success'))
         <script>

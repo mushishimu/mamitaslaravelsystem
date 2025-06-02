@@ -13,10 +13,32 @@
 </head>
 
 <body class="w-full h-auto bg-[#fefefe] relative">
+    <style>
+        /* Add this to your existing CSS */
+        .body-blur {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .body-blur::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            /* Semi-transparent white */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
     {{-- modal pending items --}}
     <dialog id="stockModal" open
         class="container fixed inset-0 z-10 bg-[#DEDEDE] pt-[50px] pb-[100px] max-h-[90vh] overflow-y-auto hidden">
-        <button id="closeModal" class="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-gray-900 p-5" 
+        <button id="closeModal" class="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-gray-900 p-5"
             aria-label="closeModal">
             ✖
         </button>
@@ -35,7 +57,7 @@
                         <button id="sortByQuantity"
                             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-2">Sort by
                             Quantity</button>
-                            
+
                     </div>
                 </div>
             </div>
@@ -47,7 +69,7 @@
                             <th scope="col" class="px-6 py-3">Status</th>
                             <th scope="col" class="px-6 py-3">Stocks</th>
                             <th scope="col" class="px-6 py-3">Expiration Date</th>
-                            
+
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="max-h-[calc(90vh-200px)] overflow-y-auto">
@@ -88,7 +110,7 @@
             </div>
         </div>
     </dialog>
-    
+
     <div id="coverup" class="hidden w-full bg-main h-screen absolute z-50 opacity-30"></div>
     <form id="filterForm">
         <div id="filterModal"
@@ -277,10 +299,12 @@
                 </div>
                 <div
                     class="w-full flex items-center text-sm py-4 px-5 text-gray-500 border-b border-[#dadada] text-left">
-                    <p class="w-[45%]">Item</p>
-                    <p class="w-[10%]">In Stock</p>
+                    <p class="w-[45%] cursor-pointer" id="item-header">Item</p>
+                    <p class="w-[20%] cursor-pointer" id="supplier-header">Supplier</p>
+                    <p class="w-[20%] cursor-pointer" id="expiration-header">Expiration</p>
+                    <p class="w-[10%] ">In Stock</p>
                     <p class="w-[15%]">Status</p>
-                    <p class="w-[15%]">Recent adjustment</p>
+                    <p class="w-[20%]">Recent adjustment</p>
                     <p class="w-[15%]"></p>
                 </div>
                 <div id="filteredItems" class="w-full">
@@ -290,30 +314,71 @@
                             $cost = $i->cost * $quantity;
                             $retail = $i->retail * $quantity;
                             $profit = $retail - $cost;
+
+                            // Expiration status check
+                            $expirationStatus = '';
+                            if (!empty($i->expiration_date)) {
+                                $expirationDate = \Carbon\Carbon::parse($i->expiration_date);
+                                $formattedDate = $expirationDate->format('m/d/Y');
+                                $today = \Carbon\Carbon::today();
+                                $daysRemaining = $today->diffInDays($expirationDate, false); // false gives negative if past
+
+                                if ($daysRemaining < 0) {
+                                    $expirationStatus =
+                                        '<p class="w-[20%] text-red-500 font-medium expiration-status">' .
+                                        $formattedDate .
+                                        ' - Expired</p>';
+                                } elseif ($daysRemaining <= 15) {
+                                    $expirationStatus =
+                                        '<p class="w-[20%] text-yellow-500 font-medium expiration-status">' .
+                                        $formattedDate .
+                                        ' - Nearly expired (' .
+                                        $daysRemaining .
+                                        ' days)</p>';
+                                } else {
+                                    $expirationStatus =
+                                        '<p class="w-[20%] text-green-500 font-medium expiration-status">' .
+                                        $formattedDate .
+                                        ' - Good Condition (' .
+                                        $daysRemaining .
+                                        ' days)</p>';
+                                }
+                            } else {
+                                $expirationStatus = '<p class="w-[20%] expiration-status">No expiration date</p>';
+                            }
+
+                            // Stock status check
+                            $stockStatus = '';
+                            if ($i->category != 'Limited Edition') {
+                                if ($quantity >= 100) {
+                                    $stockStatus = '<p class="w-[15%] text-green-500 font-medium">High amount</p>';
+                                } elseif ($quantity >= 50) {
+                                    $stockStatus = '<p class="w-[15%] text-blue-500 font-medium">Good amount</p>';
+                                } elseif ($quantity >= 20) {
+                                    $stockStatus = '<p class="w-[15%] text-orange-500 font-medium">Low amount</p>';
+                                } elseif ($quantity >= 1) {
+                                    $stockStatus =
+                                        '<p class="w-[15%] text-red-500 font-medium">Critically low amount</p>';
+                                } else {
+                                    $stockStatus = '<p class="w-[15%] text-red-500 font-medium">Items sold</p>';
+                                }
+                            } else {
+                                if ($quantity == 0) {
+                                    $stockStatus = '<p class="w-[15%] text-red-500 font-medium">Items sold</p>';
+                                } else {
+                                    $stockStatus = '<p class="w-[15%] text-[#FFD700] font-medium">Limited Edition</p>';
+                                }
+                            }
                         @endphp
+
                         <div
                             class="w-full flex items-center text-sm py-4 px-5 text-gray-700 border-b border-[#dadada] text-left">
                             <p class="w-[45%]" id="item_res">{{ $i->item }}</p>
+                            <p class="w-[20%]" id="supplier_res">{{ $i->supplier }}</p>
+                            {!! $expirationStatus !!}
                             <p class="w-[10%]" id="quantity_res">{{ $i->quantity }}</p>
-                            @php
-                                if ($i->category != 'Limited Edition' && $quantity >= 100) {
-                                    echo '<p class="w-[15%] text-green-500 font-medium">High amount</p>';
-                                } elseif ($i->category != 'Limited Edition' && $quantity >= 50) {
-                                    echo '<p class="w-[15%] text-blue-500 font-medium">Good amount</p>';
-                                } elseif ($i->category != 'Limited Edition' && $quantity >= 20) {
-                                    echo '<p class="w-[15%] text-orange-500 font-medium">Low amount</p>';
-                                } elseif ($i->category != 'Limited Edition' && $quantity >= 1) {
-                                    echo '<p class="w-[15%] text-red-500 font-medium">Critically low amount</p>';
-                                } elseif ($i->category != 'Limited Edition' && $quantity == 0) {
-                                    echo '<p class="w-[15%] text-red-500 font-medium">Items sold</p>';
-                                } elseif ($i->category == 'Limited Edition' && $quantity == 0) {
-                                    echo '<p class="w-[15%] text-red-500 font-medium">Items sold</p>';
-                                } elseif ($i->category == 'Limited Edition') {
-                                    echo '<p class="w-[15%] text-[#FFD700] font-medium">Limited Edition</p>';
-                                }
-                            @endphp
-                            </p>
-                            <p class="w-[15%]">{{ $i->update_reason }}</p>
+                            {!! $stockStatus !!}
+                            <p class="w-[20%]">{{ $i->update_reason }}</p>
                             <button
                                 onclick="openAdjustmentModal('{{ $i->id }}', '{{ $i->item }}', '{{ $i->quantity }}')"
                                 class="w-[15%] flex items-center justify-center">
@@ -322,6 +387,7 @@
                                     <path
                                         d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z" />
                                 </svg>
+                                &nbsp;<span>Stock Adjustment</span>
                             </button>
                         </div>
                     @endforeach
@@ -384,7 +450,7 @@
                 <h2 class="text-xl font-semibold">Stock Adjustment</h2>
                 <button onclick="closeAdjustmentModal()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
-                    
+
                 </button>
             </div>
 
@@ -418,7 +484,7 @@
 
                 {{-- For Increase Stock --}}
                 <div id="increaseFields" class="mb-4">
-                    <div class="mb-4">
+                    <div class="mb-4 hidden">
                         <label class="block mb-2">Batch Number</label>
                         <input type="text" name="batch_number" class="w-full rounded-lg border p-2">
                     </div>
@@ -528,11 +594,19 @@
 
         // Search functionality
         $('#searchProduct').on('keyup', function() {
-            let searchValue = $(this).val().toLowerCase();
+            let searchValue = $(this).val();
 
-            $('#filteredItems > div').each(function() {
-                let itemName = $(this).find('#item_res').text().toLowerCase();
-                $(this).toggle(itemName.includes(searchValue));
+            $.ajax({
+                url: window.location.href, // or route('/stocks-adjustment')
+                type: 'GET',
+                data: {
+                    search: searchValue
+                },
+                success: function(response) {
+                    // Assuming you return the full page, you can parse the part you want:
+                    // Or better, return only the items list as a partial view.
+                    $('#filteredItems').html($(response).find('#filteredItems').html());
+                }
             });
         });
 
@@ -629,20 +703,21 @@
         const openModalBtn = document.getElementById("openModal");
         const closeModalBtn = document.getElementById("closeModal");
         const urlParams = new URLSearchParams(window.location.search);
+
         // Show modal
         openModalBtn.addEventListener("click", function(event) {
-            event.preventDefault(); // Prevent page navigation
+            event.preventDefault();
             modal.classList.remove("hidden");
             modal.classList.add("flex");
+            document.body.classList.add("body-blur");
         });
-
-
 
         // Check if 'opendialog' exists in the query parameters
         if (urlParams.has('opendialog')) {
             // Open the modal
             modal.classList.remove("hidden");
             modal.classList.add("flex");
+            document.body.classList.add("body-blur");
 
             // Get the value of the 'opendialog' parameter
             const itemName = decodeURIComponent(urlParams.get('opendialog'));
@@ -652,18 +727,15 @@
             let targetRow = null;
 
             rows.forEach(row => {
-                const rowName = row.getAttribute('data-name'); // Assuming 'data-name' contains the item name
-                if (rowName === itemName.toLowerCase()) { // Case-insensitive comparison
+                const rowName = row.getAttribute('data-name');
+                if (rowName === itemName.toLowerCase()) {
                     targetRow = row;
                 }
             });
 
-            // If the target row is found, highlight it and scroll into view
+            // If the target row is found, highlight it
             if (targetRow) {
-                // Highlight the row by adding a CSS class
                 targetRow.classList.add('highlight');
-
-                // Scroll the row into view
                 targetRow.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center'
@@ -677,6 +749,12 @@
         closeModalBtn.addEventListener("click", function() {
             modal.classList.add("hidden");
             modal.classList.remove("flex");
+            document.body.classList.remove("body-blur");
+
+            // Remove highlight from any rows
+            document.querySelectorAll('.highlight').forEach(el => {
+                el.classList.remove('highlight');
+            });
         });
 
         // Close modal when clicking outside the content
@@ -684,6 +762,12 @@
             if (event.target === modal) {
                 modal.classList.add("hidden");
                 modal.classList.remove("flex");
+                document.body.classList.remove("body-blur");
+
+                // Remove highlight from any rows
+                document.querySelectorAll('.highlight').forEach(el => {
+                    el.classList.remove('highlight');
+                });
             }
         });
     </script>
@@ -767,6 +851,121 @@
         document.getElementById('sortByQuantity').addEventListener('click', sortByQuantity);
     </script>
 
+    {{-- script for filtration --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all header elements by ID
+            const itemHeader = document.getElementById('item-header');
+            const supplierHeader = document.getElementById('supplier-header');
+            const expirationHeader = document.getElementById('expiration-header');
+
+            // Initialize sort directions
+            let itemSortDirection = 1; // 1 for A-Z, -1 for Z-A
+            let supplierSortDirection = 1;
+            let expirationSortDirection = 1; // 1 for Expired first, -1 for Good first
+
+            // Add click event listeners
+            itemHeader.addEventListener('click', () => sortItems('item', itemSortDirection = -itemSortDirection));
+            supplierHeader.addEventListener('click', () => sortItems('supplier', supplierSortDirection = -
+                supplierSortDirection));
+            expirationHeader.addEventListener('click', () => sortItems('expiration', expirationSortDirection = -
+                expirationSortDirection));
+
+            function sortItems(sortBy, direction) {
+                const container = document.getElementById('filteredItems');
+                const items = Array.from(container.querySelectorAll('div.flex.items-center.border-b'));
+
+                items.sort((a, b) => {
+                    let aValue, bValue;
+
+                    switch (sortBy) {
+                        case 'item':
+                            aValue = a.querySelector('p[id="item_res"]').textContent.toLowerCase();
+                            bValue = b.querySelector('p[id="item_res"]').textContent.toLowerCase();
+                            return direction * aValue.localeCompare(bValue);
+
+                        case 'supplier':
+                            aValue = a.querySelector('p[id="supplier_res"]').textContent.toLowerCase();
+                            bValue = b.querySelector('p[id="supplier_res"]').textContent.toLowerCase();
+                            return direction * aValue.localeCompare(bValue);
+
+                        case 'expiration':
+                            // Get the expiration status text (includes the date and status)
+                            aValue = a.querySelector('p.expiration-status').textContent.toLowerCase();
+                            bValue = b.querySelector('p.expiration-status').textContent.toLowerCase();
+
+
+                            // Sort logic for expiration:
+                            // 1. Expired items first/last
+                            // 2. Nearly expired next
+                            // 3. Good condition last/first
+
+                            // Check if expired
+                            const aExpired = aValue.includes('expired') && !aValue.includes('nearly');
+                            const bExpired = bValue.includes('expired') && !bValue.includes('nearly');
+
+                            // Check if nearly expired
+                            const aNearly = aValue.includes('nearly expired');
+                            const bNearly = bValue.includes('nearly expired');
+
+                            // Check if good condition
+                            const aGood = aValue.includes('good condition');
+                            const bGood = bValue.includes('good condition');
+
+                            // No expiration date
+                            const aNoDate = aValue.includes('no expiration date');
+                            const bNoDate = bValue.includes('no expiration date');
+
+                            // Sort order based on direction
+                            if (direction === 1) {
+                                // Expired -> Nearly -> Good -> No date
+                                if (aExpired && !bExpired) return -1;
+                                if (!aExpired && bExpired) return 1;
+                                if (aNearly && !bNearly && !bExpired) return -1;
+                                if (!aNearly && bNearly && !aExpired) return 1;
+                                if (aGood && !bGood && !bNearly && !bExpired) return -1;
+                                if (!aGood && bGood && !aNearly && !aExpired) return 1;
+                                return 0;
+                            } else {
+                                // Good -> Nearly -> Expired -> No date
+                                if (aGood && !bGood) return -1;
+                                if (!aGood && bGood) return 1;
+                                if (aNearly && !bNearly && !bGood) return -1;
+                                if (!aNearly && bNearly && !aGood) return 1;
+                                if (aExpired && !bExpired && !bNearly && !bGood) return -1;
+                                if (!aExpired && bExpired && !aNearly && !aGood) return 1;
+                                return 0;
+                            }
+                    }
+                });
+
+                // Clear the container
+                container.innerHTML = '';
+
+                // Append sorted items
+                items.forEach(item => container.appendChild(item));
+
+                // Update UI to show sort direction (optional)
+                updateSortIndicators(sortBy, direction);
+            }
+
+            function updateSortIndicators(sortBy, direction) {
+                // Reset all indicators
+                document.querySelectorAll('.sort-indicator').forEach(el => el.remove());
+
+                // Add indicator to the clicked header
+                let header;
+                if (sortBy === 'item') header = itemHeader;
+                else if (sortBy === 'supplier') header = supplierHeader;
+                else if (sortBy === 'expiration') header = expirationHeader;
+
+                const indicator = document.createElement('span');
+                indicator.className = 'sort-indicator ml-1';
+                indicator.textContent = direction === 1 ? '↑' : '↓';
+                header.appendChild(indicator);
+            }
+        });
+    </script>
 </body>
 
 </html>

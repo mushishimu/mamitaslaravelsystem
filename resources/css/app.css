@@ -5,3 +5,11 @@
 .highlight {
     @apply bg-yellow-100;
  }
+
+ #head p{
+    @apply uppercase;
+ }
+
+ p.text-lg.text-white{
+    @apply uppercase;
+ }

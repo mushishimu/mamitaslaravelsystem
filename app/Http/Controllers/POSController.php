@@ -161,7 +161,7 @@ class POSController extends Controller
 
         if ($amount >= 1 && $amount <= 100) {
             $charge = 1;
-        } elseif ($amount >= 101 && $amount <= 200)  {
+        } elseif ($amount >= 101 && $amount <= 200) {
             $charge = 2;
         } elseif ($amount >= 201 && $amount <= 300) {
             $charge = 3;
@@ -274,7 +274,7 @@ class POSController extends Controller
         if (!isset($cashier_name)) {
             return redirect()->route('login');
         }
-        
+
         $cmsData = Cms::first();  // Add this line
         // Get today's date
         $today = Carbon::today();
@@ -285,7 +285,7 @@ class POSController extends Controller
         $gcash_transactions = GCash::whereDate('created_at', $today)->get();
 
         return view('history', [
-            'history' => $history, 
+            'history' => $history,
             'gcash' => $gcash_transactions,
             'cms' => $cmsData  // Add this line
         ]);
@@ -650,23 +650,36 @@ class POSController extends Controller
             $order = SupplierOrder::find($orderData['id']);
 
             if ($order) {
+                // Format the expiration date for database storage
+                $expirationDate = Carbon::createFromFormat('m/d/Y', $orderData['expiration_date'])->format('Y-m-d');
+
                 // Retrieve the item name and quantity from the order
-                $itemName = $order->item; // Adjust this if your column name is different
-                $quantity = $order->quantity; // Adjust this if your column name is different
+                $itemName = $order->item;
+                $quantity = $order->quantity;
 
                 // Find the corresponding item in the Stocks model
                 $stock = Stocks::where('item', $itemName)->first();
 
                 if ($stock) {
-                    // Update the quantity in the Stocks model
+                    // Update the quantity and expiration date in the Stocks model
                     $stock->quantity += $quantity;
+                    $stock->expiration_date = $expirationDate; // Add this line to update expiration
                     $stock->update_reason = 'New stocks';
+                    $stock->save();
+                } else {
+                    // If stock doesn't exist, create a new one
+                    $stock = new Stocks();
+                    $stock->item = $itemName;
+                    $stock->quantity = $quantity;
+                    $stock->expiration_date = $expirationDate;
+                    $stock->update_reason = 'New stocks';
+                    // Set other required fields for Stocks model
                     $stock->save();
                 }
 
                 // Update the expiration date and status for the order
                 $order->status = 'Delivered';
-                $order->expiration_date = Carbon::createFromFormat('m/d/Y', $orderData['expiration_date'])->format('Y-m-d');
+                $order->expiration_date = $expirationDate;
                 $order->save();
             }
         }

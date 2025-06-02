@@ -77,7 +77,7 @@
                     <img src="{{ asset('images/order-new.png') }}" alt="" class="w-[30px] h-auto">
                 </a>
             </div>
-<div class="w-full relative">
+            <div class="w-full relative">
                 <form id="logoutForm" action="{{ route('office.logout') }}" method="POST">
                     @csrf
                     <a href="#" id="logoutLink" class="w-full flex items-center justify-center h-auto py-4">
@@ -118,14 +118,16 @@
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Item Name</label>
                                 <input type="text" name="item_name"
-                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main" required>
+                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
+                                    required>
                             </div>
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">SKU</label>
                                 <input type="text" name="item_sku"
-                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main" required>
+                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
+                                    required>
                             </div>
-                            
+
                         </div>
 
                         <div class="w-full flex items-center justify-between gap-5 mb-10">
@@ -139,16 +141,12 @@
                                 </select>
                             </div>
 
-                            <div class="w-1/2">
+                            {{-- <div class="w-1/2">
                                 <label for="expiration_date">Expiration Date</label>
-                                <input 
-                                    type="date" 
-                                    name="expiration_date" 
-                                    id="expiration_date" 
+                                <input type="date" name="expiration_date" id="expiration_date"
                                     class="w-full rounded-xl outline-none border border-[#bebebe] focus:border focus:border-main px-4 py-2 mb-3"
-                                    min="{{ date('Y-m-d') }}"
-                                >
-                            </div>
+                                    min="{{ date('Y-m-d') }}">
+                            </div> --}}
                         </div>
 
                         <div class="w-full flex items-center justify-between gap-5 mb-10">
@@ -218,23 +216,39 @@
                                 </select>
                             </div>
                             <div class="w-1/2">
-                                <label for="" class="text-gray-500">Barcode</label>
-                                <input type="text" name="item_barcode"
+                                <label for="item_barcode" class="text-gray-500">Barcode</label>
+                                <input type="text" id="item_barcode" name="item_barcode"
                                     class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
-                                    autofocus="false">
+                                    required>
                             </div>
+
+                            <script>
+                                function generateRandomBarcode(length = 12) {
+                                    let barcode = '';
+                                    for (let i = 0; i < length; i++) {
+                                        barcode += Math.floor(Math.random() * 10); // 0–9 digits
+                                    }
+                                    return barcode;
+                                }
+
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const barcodeField = document.getElementById('item_barcode');
+                                    barcodeField.value = generateRandomBarcode();
+                                });
+                            </script>
+
                         </div>
                     </div>
                     <div class=" bg-white rounded-md p-10">
                         <div class="w-full flex items-center justify-between gap-16 mb-10">
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Purchase Cost</label>
-                                <input type="number" name="cost" step="any"
+                                <input type="number" name="cost" step="any" id="purchase_cost"
                                     class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main">
                             </div>
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Retail Value</label>
-                                <input type="number" name="retail"
+                                <input type="number" name="retail" id="retail_value"
                                     class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main">
                             </div>
                         </div>
@@ -258,20 +272,20 @@
                                 function previewImage(event) {
                                     const input = event.target;
                                     const preview = document.getElementById('imagePreview');
-    
+
                                     if (input.files && input.files[0]) {
                                         const reader = new FileReader();
-    
+
                                         reader.onload = function(e) {
                                             preview.src = e.target.result;
                                             preview.classList.remove('hidden');
                                         };
-    
+
                                         reader.readAsDataURL(input.files[0]);
                                     }
                                 }
                             </script>
-                           
+
                         </div>
                         <div class="w-1/2 flex gap-5 items-center justify-end">
                             <button type="button" id="submitButton"
@@ -283,77 +297,80 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.getElementById('submitButton').addEventListener('click', function(event) {
             event.preventDefault(); // Prevent the default form submission
-        
-            // Form validation: Check required fields
+
             const itemName = document.querySelector('input[name="item_name"]').value.trim();
-            // const itemQuantity = document.querySelector('input[name="item_quantity"]').value.trim();
-            const errorMessage = [];
-        
+            const purchaseCost = parseFloat(document.querySelector('input[name="cost"]').value);
+            const retailValue = parseFloat(document.querySelector('input[name="retail"]').value);
+            const errorMessages = [];
+
+            // Required field validation
             if (!itemName) {
-                errorMessage.push('Item Name is required.');
+                errorMessages.push("Item Name is required.");
             }
-            // if (!itemQuantity) {
-            //     errorMessage.push('Item Quantity is required.');
-            // }
-        
-            // Show error if validation fails
-            if (errorMessage.length > 0) {
+
+            // Business logic validation
+            if (!isNaN(purchaseCost) && !isNaN(retailValue) && purchaseCost > retailValue) {
+                errorMessages.push("Purchase Cost should not be higher than Retail Value.");
+            }
+
+            // If any errors, show them with Swal
+            if (errorMessages.length > 0) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorMessage.join(" "),
+                    html: errorMessages.join("<br>"), // line break for each error
                     icon: "error",
                     confirmButtonColor: "#d33",
                 });
                 return;
             }
-        
-            // If validation passes, show success popup only
+
+            // Show success alert and then submit the form
             Swal.fire({
                 title: "Success!",
                 text: "Your item has been added successfully.",
                 icon: "success",
                 confirmButtonColor: "#3085d6",
             }).then(() => {
-                // Submit the form after success
-                document.getElementById('itemForm').submit(); // Submit the form
+                document.getElementById('itemForm').submit();
             });
         });
-        
+
+        // Prevent Enter key submission on QR input
         document.addEventListener('DOMContentLoaded', function() {
-            var qrInput = document.querySelector('input[name="item_qr"]');
-        
-            qrInput.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault(); // Prevent default Enter key behavior
-                }
-            });
+            const qrInput = document.querySelector('input[name="item_qr"]');
+            if (qrInput) {
+                qrInput.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                    }
+                });
+            }
         });
-        
-        var main = document.getElementById('main');
-        
+
+        // Toggle functions
+        const main = document.getElementById('main');
+
         function openInventoryOptions() {
-            var inventoryOptions = document.getElementById('inventory_options');
-            inventoryOptions.classList.toggle('hidden');
+            document.getElementById('inventory_options').classList.toggle('hidden');
             main.classList.toggle('blur-5px');
         }
-        
+
         function openDashboard() {
-            var inventoryOptions = document.getElementById('dash_options');
-            inventoryOptions.classList.toggle('hidden');
+            document.getElementById('dash_options').classList.toggle('hidden');
             main.classList.toggle('blur-5px');
         }
-        
+
         function openItems() {
-            var inventoryOptions = document.getElementById('items_options');
-            inventoryOptions.classList.toggle('hidden');
+            document.getElementById('items_options').classList.toggle('hidden');
             main.classList.toggle('blur-5px');
         }
     </script>
-    
-    
+
+
 </body>
 
 </html>

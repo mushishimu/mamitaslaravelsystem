@@ -371,18 +371,34 @@ class OfficeController extends Controller
         return view('backoffice/sales_history', ['history' => $history]);
     }
 
-    public function stocksAdjustment()
+    public function stocksAdjustment(Request $request)
     {
         $cms = DB::table('cms')->first();
-        $item = Stocks::paginate(10);
+
+        $search = $request->input('search'); // get search input
+
+        $query = Stocks::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('item', 'like', "%$search%")
+                    ->orWhere('supplier', 'like', "%$search%")
+                    ->orWhere('expiration_date', 'like', "%$search%");
+            });
+        }
+
+        $item = $query->paginate(10)->appends(['search' => $search]);
 
         // Get logs with item names
         $adjustmentLogs = DB::table('stock_adjustment_logs')
             ->orderBy('created_at', 'desc')
             ->get();
+
         $stocks_alert = Stocks::where('quantity', '<=', 20)->get();
+
         return view('backoffice.inventory.stocks_adjustment', compact('item', 'adjustmentLogs', 'cms', 'stocks_alert'));
     }
+
 
     public function filterItems(Request $request)
     {
@@ -998,7 +1014,9 @@ class OfficeController extends Controller
         return response()->json($suppliers);
     }
 
-    public function supplierLiveSearch($key) {}
+    public function supplierLiveSearch($key)
+    {
+    }
 
     public function pendingItems()
     {
@@ -1253,6 +1271,55 @@ class OfficeController extends Controller
             );
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to export data: ' . $e->getMessage());
+        }
+    }
+
+    // In your controller
+    public function getItemsBySupplier(Request $request)
+    {
+        try {
+            // Validate the supplier_id parameter
+            if (!$request->supplier_id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Supplier ID is required'
+                ], 400);
+            }
+
+            // Get supplier name
+            $supplierName = DB::table('suppliers')
+                ->where('id', $request->supplier_id)
+                ->value('name');
+
+            if (!$supplierName) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Supplier not found'
+                ], 404);
+            }
+
+            // Get items from stocks table - keep original column names for JavaScript compatibility
+            $items = DB::table('stocks')
+                ->where('supplier', $supplierName)
+                ->select('id', 'item', 'retail as price')
+                ->orderBy('item', 'asc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'status' => 'success',
+                'supplier' => $supplierName,
+                'items' => $items
+            ]);
+
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Error in getItemsBySupplier: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching items'
+            ], 500);
         }
     }
 }

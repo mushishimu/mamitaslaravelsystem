@@ -201,7 +201,7 @@
                         filter</button>
                     <button onclick="window.location.href='{{ route('office.create_item') }}'"
                         class="px-5 bg-[#4d4d4d] font-medium uppercase text-xs py-2 text-white">Add Item</button>
-                    <div class="w-[120px] flex items-center relative">
+                    <div class="w-[120px] flex items-center relative hidden">
                         <button onclick="window.location.href='{{ route('office.pending_items')}}'"
                             class="w-full font-medium uppercase text-xs py-2 text-main">Pending Items</button>
                         <div

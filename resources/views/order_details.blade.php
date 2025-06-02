@@ -181,10 +181,10 @@
                 <img src="{{ asset('images/history-new.png') }}" alt="History" class="w-1/3">
                 <p class="text-xs text-gray-600">History</p>
             </div>
-            <div class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
+            {{-- <div class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{ asset('images/inv-new.png') }}" alt="Inventory" class="w-1/3">
                 <p class="text-xs text-gray-600">Inventory</p>
-            </div>
+            </div> --}}
             <div class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{ asset('images/order-new.png') }}" alt="Orders" class="w-1/3">
                 <p class="text-xs text-gray-600">Orders</p>

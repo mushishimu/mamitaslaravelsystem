@@ -38,10 +38,10 @@
                 <img src="{{asset('images/history-new.png')}}" alt="Cashier Icon" class="w-1/3">
                 <p class="text-xs text-[#565857]">History</p>
             </div>
-            <div href="{{route('inventory')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
+            {{-- <div href="{{route('inventory')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{asset('images/inv-new.png')}}" alt="Cashier Icon" class="w-1/3">
                 <p class="text-xs text-[#565857]">Inventory</p>
-            </div>
+            </div> --}}
             <div href="{{route('orders')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{asset('images/order-new.png')}}" alt="Cashier Icon" class="w-1/3">
                 <p class="text-xs text-[#565857]">Orders</p>

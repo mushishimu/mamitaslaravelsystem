@@ -35,10 +35,10 @@
                 <img src="{{asset('images/history-new.png')}}" alt="Cashier Icon" class="w-1/3">
                 <p class="text-xs text-[#565857]">History</p>
             </a>
-            <a href="{{route('inventory')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4 rounded-xl bg-[#f5a7a4]">
+            {{-- <a href="{{route('inventory')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4 rounded-xl bg-[#f5a7a4]">
                 <img src="{{asset('images/inv-red.png')}}" alt="Cashier Icon" class="w-1/3">
                 <p class="text-xs text-[#e5231a]">Inventory</p>
-            </a>
+            </a> --}}
             <a href="{{route('orders')}}" class="flex w-2/3 mx-auto flex-col items-center justify-center py-4">
                 <img src="{{asset('images/order-new.png')}}" alt="Cashier Icon" class="w-1/3">
                 <p class="text-xs text-[#565857]">Orders</p>

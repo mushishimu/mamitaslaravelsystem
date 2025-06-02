@@ -111,7 +111,11 @@ Route::middleware([IsAdminLoggedIn::class])->group(function () {
     Route::POST('/back-office/place-order', [OfficeController::class, 'placeOrder'])->name('office.place_order');
     Route::get('/back-office/cashiers/add_cashier/{name}', [OfficeController::class, 'acceptAccount'])->name('office.accept');
     Route::get('/back-office/get_sales_per_month/{date}', [OfficeController::class, 'getSalesPerMonth'])->name('office.get_sales_per_month');
+
     Route::get('/back-office/filter-items', [OfficeController::class, 'filterItems'])->name('office.filter_items');
+
+    Route::get('/back-office/filter-item', [OfficeController::class, 'getItemsBySupplier'])->name('office.items_by_supplier');
+
     Route::get('/back-office/new-order', [OfficeController::class, 'newOrder'])->name('office.new_order');
     Route::get('/back-office/item-list-search/{key?}', [OfficeController::class, 'itemListsearch'])->name('office.item_list_search');
     Route::get('/back-office/filter-supplier-address', [OfficeController::class, 'filterSupplierAddress'])->name('office.filter_address');

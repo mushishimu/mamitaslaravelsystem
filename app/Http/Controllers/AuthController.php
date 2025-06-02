@@ -38,7 +38,7 @@ class AuthController extends Controller
 
         return redirect()
             ->route('welcome')
-            ->with('error', 'Authentication failed. Please check your credentials.');
+            ->withErrors(['error' => 'Authentication failed. Please check your credentials.']);
     }
 
     public function authLoginAdmin(Request $request)
@@ -54,22 +54,21 @@ class AuthController extends Controller
 
         // Authentication Attempt
         if (Auth::guard('admin')->attempt($credentials)) {
-            // dd(Auth::check());
-
             // If authenticated, get the user
             $user = Auth::guard('admin')->user();
-            // dd($user)
 
             if ($user->role === 'Admin') {
-                session(['admin_name' => $user->name]); // Use $user directly
+                session(['admin_name' => $user->name]);
                 return redirect()->intended(route('office.dashboard'));
             }
         }
 
+        // Correct this line here
         return redirect()
             ->back()
-            ->with('error', 'Authentication failed. Please check your credentials.');
+            ->withErrors(['error' => 'Authentication failed. Please check your credentials.']);
     }
+
 
     public function adminLogout(Request $request)
     {
@@ -102,7 +101,7 @@ class AuthController extends Controller
         $cashiers = Authentication::all();
         $pending = PendingAccount::all();
 
-        return view('backoffice/cashiers/cashiers', ['cashiers' => $cashiers, 'pendings' => $pending,   'cms' => $cmsData])->with('success', 'Cashier added successfully!');
+        return view('backoffice/cashiers/cashiers', ['cashiers' => $cashiers, 'pendings' => $pending, 'cms' => $cmsData])->with('success', 'Cashier added successfully!');
     }
 
     public function addAdmin()
