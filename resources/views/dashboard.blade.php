@@ -8,6 +8,9 @@
     <script src="{{ asset('jquery/jquery.js') }}"></script>
     @vite('resources/css/app.css')
     <title>Dashboard</title>
+
+    
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body class="w-full h-auto relative bg-[#e4e4e4]">
@@ -168,14 +171,25 @@
                     </div>
 
 
-                    <div class="relative w-[20%] mb-6">
-                        <input id="search_item" type="text" name="search" placeholder="Search item"
-                            class="w-full rounded-full py-1 px-4 outline-none">
-                        <img src="{{ asset('images/search.png') }}" alt=""
-                            class="w-[8%] absolute right-2 top-1">
+                    <div class="relative w-[20%] mb-6 flex gap-2">
+                        <input
+                            id="search_item"
+                            type="search"
+                            name="search_item"
+                            placeholder="Search item"
+                            class="py-1 px-4 outline-none w-[60%] rounded-xl"
+                            autocomplete="off"
+                        >
+                        <input
+                            id="barcode-input"
+                            type="text"
+                            name="barcode"
+                            placeholder="Barcode"
+                            class="py-1 px-4 outline-none w-[40%] rounded-xl"
+                            autocomplete="off"
+                            autofocus
+                        >
                     </div>
-                    <input id="barcode" type="search" name="barcode" placeholder="Barcode"
-                        class="py-1 px-4 outline-none w-[20%] mb-6 rounded-xl">
                 </div>
 
                 {{-- notifications --}}
@@ -510,6 +524,32 @@
                 orders = [];
                 updateOrdersDisplay();
             });
+        });
+
+        document.getElementById('barcode-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                let barcode = this.value.trim();
+                if (!barcode) return;
+                fetch('/search-barcode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ barcode: barcode })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Gumamit ng existing function para pumasok sa order list
+                        addToOrders(data.item.item, parseFloat(data.item.retail), 1);
+                        updateOrdersDisplay();
+                    } else {
+                        alert('Item not found!');
+                    }
+                    this.value = '';
+                });
+            }
         });
     </script>
 
