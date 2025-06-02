@@ -219,24 +219,8 @@
                                 <label for="item_barcode" class="text-gray-500">Barcode</label>
                                 <input type="text" id="item_barcode" name="item_barcode"
                                     class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
-                                    required>
+                                    value="">
                             </div>
-
-                            <script>
-                                function generateRandomBarcode(length = 12) {
-                                    let barcode = '';
-                                    for (let i = 0; i < length; i++) {
-                                        barcode += Math.floor(Math.random() * 10); // 0–9 digits
-                                    }
-                                    return barcode;
-                                }
-
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    const barcodeField = document.getElementById('item_barcode');
-                                    barcodeField.value = generateRandomBarcode();
-                                });
-                            </script>
-
                         </div>
                     </div>
                     <div class=" bg-white rounded-md p-10">
