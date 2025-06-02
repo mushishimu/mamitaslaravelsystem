@@ -44,6 +44,7 @@ Route::middleware([isCashierLoggedIn::class])->group(function () {
     Route::post('/gcash', [POSController::class, 'gCash'])->name('gcash');
     Route::get('/add-item', [POSController::class, 'addItem'])->name('add_item');
     Route::post('/add-to-pending', [POSController::class, 'toPendingItems'])->name('to_pending');
+    Route::post('/search-barcode', [\App\Http\Controllers\POSController::class, 'searchBarcode']);
 
 });
 

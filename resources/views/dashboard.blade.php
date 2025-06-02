@@ -512,6 +512,55 @@
             });
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const barcodeInput = document.getElementById('barcode-input');
+            if (barcodeInput) {
+                barcodeInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const barcode = this.value.trim();
+                        if (!barcode) return;
+
+                        fetch("{{ url('/search-barcode') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({ barcode: barcode })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.item) {
+                                // Add to orders immediately
+                                addToOrders(data.item.item, parseFloat(data.item.retail), 1);
+                                updateOrdersDisplay();
+                            } else {
+                                Swal.fire({
+                                    title: "Not found!",
+                                    text: "Barcode not found or item unavailable.",
+                                    icon: "error",
+                                    confirmButtonColor: "#d33"
+                                });
+                            }
+                            barcodeInput.value = '';
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Barcode search failed.",
+                                icon: "error",
+                                confirmButtonColor: "#d33"
+                            });
+                            barcodeInput.value = '';
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 
 
 </body>

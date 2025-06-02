@@ -745,4 +745,26 @@ class POSController extends Controller
         // Return the view with CMS data
         return view('welcome', ['cms' => $cmsData]);
     }
+
+    public function searchBarcode(Request $request)
+    {
+        $barcode = $request->input('barcode');
+        $item = \App\Models\Menu::where('barcode', $barcode)->first();
+
+        if ($item) {
+            return response()->json([
+                'success' => true,
+                'item' => [
+                    'item' => $item->item,
+                    'retail' => $item->retail,
+                    // add other fields if needed
+                ]
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item not found'
+            ]);
+        }
+    }
 }
