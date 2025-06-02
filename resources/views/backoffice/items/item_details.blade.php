@@ -105,8 +105,9 @@
         <div class="w-[95%] bg-[#f2f2f2] z-0 p-7">
             <div class="w-1/2 flex mx-auto shadow-md text-sm">
                 <form action="{{ route('office.update_item') }}" class="w-full" method="POST"
-                    enctype="multipart/form-data">
+                    enctype="multipart/form-data" id="itemForm">
                     @csrf
+                    <input type="hidden" name="id" value="{{ $item->id }}">
                     <div class=" bg-white rounded-md p-10 mb-5">
 
                         <div class="flex justify-between">
@@ -231,26 +232,34 @@
                                     autofocus="false" required>
                             </div>
                         </div>
-
-
-
-                        <div class="w-full flex items-center justify-between gap-5">
+                        <div class="w-full flex items-center justify-between gap-5 mb-5">
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Product unit</label>
                                 <select name="product_unit"
                                     class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
                                     required>
-                                    <option value="pc">Per pc</option>
-                                    <option value="kg">Per kg</option>
-                                    <option value="pack">Per pack</option>
-                                    <option value="sack">Per sack</option>
+                                    <option value="pc" {{ $item->product_unit == 'pc' ? 'selected' : '' }}>Per pc
+                                    </option>
+                                    <option value="kg" {{ $item->product_unit == 'kg' ? 'selected' : '' }}>Per kg
+                                    </option>
+                                    <option value="pack" {{ $item->product_unit == 'pack' ? 'selected' : '' }}>Per
+                                        pack</option>
+                                    <option value="sack" {{ $item->product_unit == 'sack' ? 'selected' : '' }}>Per
+                                        sack</option>
                                 </select>
                             </div>
                             <div class="w-1/2">
-                                <label for="" class="text-gray-500">Barcode</label>
-                                <input type="text" name="barcode" value="{{ $item->barcode }}"
+                                <label for="item_barcode" class="text-gray-500">Barcode</label>
+                                <div class="flex gap-2 mb-2">
+                                    <button type="button" id="no-barcode-btn"
+                                        class="px-3 py-1 rounded bg-gray-300 text-gray-700 text-xs">No Barcode</button>
+                                    <button type="button" id="have-barcode-btn"
+                                        class="px-3 py-1 rounded bg-blue-500 text-white text-xs">Have Barcode</button>
+                                </div>
+                                <input type="hidden" id="barcode_option" name="barcode_option" value="{{ ($item->barcode && $item->barcode !== 'N/A') ? 'yes' : 'no' }}">
+                                <input type="text" id="item_barcode" name="item_barcode"
                                     class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
-                                    autofocus="false" required>
+                                    value="{{ $item->barcode ?? 'N/A' }}" placeholder="Enter barcode here">
                             </div>
                         </div>
                     </div>
@@ -305,23 +314,31 @@
             if (errorMessages.length > 0) {
                 Swal.fire({
                     title: "Error!",
-                    html: errorMessages.join("<br>"), // line break for each error
+                    html: errorMessages.join("<br>"),
                     icon: "error",
                     confirmButtonColor: "#d33",
                 });
                 return;
             }
 
-            // Show success alert and then submit the form
+            // Show success alert and then redirect to item list after form submit
             Swal.fire({
                 title: "Success!",
-                text: "Your item has been added successfully.",
+                text: "Your item has been updated successfully.",
                 icon: "success",
                 confirmButtonColor: "#3085d6",
+                timer: 1200,
+                showConfirmButton: false
             }).then(() => {
-                document.getElementById('itemForm').submit();
+                window.location.href = "{{ route('office.items_list') }}";
             });
         });
+
+        // Redirect to item list after successful update (on page load, if session has 'success')
+        @if (session('success'))
+            window.location.href = "{{ route('office.items_list') }}";
+        @endif
+
     </script>
 
     @if (session('success'))
@@ -336,6 +353,41 @@
             });
         </script>
     @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const barcodeInput = document.getElementById('item_barcode');
+            const noBarcodeBtn = document.getElementById('no-barcode-btn');
+            const haveBarcodeBtn = document.getElementById('have-barcode-btn');
+            const barcodeOption = document.getElementById('barcode_option');
+
+            if (barcodeInput.value === 'N/A' || !barcodeInput.value) {
+                barcodeInput.value = 'N/A';
+                barcodeInput.readOnly = true;
+                barcodeInput.placeholder = 'No barcode required';
+                barcodeOption.value = 'no';
+            } else {
+                barcodeInput.readOnly = false;
+                barcodeInput.placeholder = 'Enter barcode here';
+                barcodeOption.value = 'yes';
+            }
+
+            noBarcodeBtn.addEventListener('click', function () {
+                barcodeInput.value = 'N/A';
+                barcodeInput.readOnly = true;
+                barcodeInput.placeholder = 'No barcode required';
+                barcodeOption.value = 'no';
+            });
+
+            haveBarcodeBtn.addEventListener('click', function () {
+                barcodeInput.value = '';
+                barcodeInput.readOnly = false;
+                barcodeInput.placeholder = 'Enter barcode here';
+                barcodeInput.focus();
+                barcodeOption.value = 'yes';
+            });
+        });
+    </script>
 
 </body>
 

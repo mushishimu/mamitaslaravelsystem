@@ -8,6 +8,54 @@
     <script src="{{ asset('jquery/jquery.js') }}"></script>
     @vite('resources/css/app.css')
     <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Replace the default alert for "No items selected" with a styled SweetAlert2 popup
+        function showNoItemsSelectedPopup() {
+            Swal.fire({
+                title: 'No Items Selected',
+                html: '<div style="font-size:1.1em;color:#e5231a;"><i class="fa fa-box-open" style="font-size:2em;color:#f59e42;"></i><br><br>Please select at least one item before completing the order.</div>',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#f59e42',
+                background: '#fffbe6',
+                customClass: {
+                    popup: 'shadow-lg rounded-xl border-2 border-[#f59e42]'
+                }
+            });
+        }
+
+        function showInvalidDatePopup() {
+            Swal.fire({
+                title: 'Invalid Date',
+                html: '<div style="font-size:1.1em;color:#e5231a;"><i class="fa fa-calendar-times" style="font-size:2em;color:#f59e42;"></i><br><br>The date you entered is already past. Please select a valid date.</div>',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#f59e42',
+                background: '#fffbe6',
+                customClass: {
+                    popup: 'shadow-lg rounded-xl border-2 border-[#f59e42]'
+                }
+            });
+        }
+
+        // Example validation for date input
+        function validateOrderDate(dateInputSelector) {
+            const dateInput = document.querySelector(dateInputSelector);
+            if (!dateInput) return true;
+            const inputDate = new Date(dateInput.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            inputDate.setHours(0, 0, 0, 0);
+
+            if (inputDate < today) {
+                showInvalidDatePopup();
+                return false;
+            }
+            return true;
+        }
+
+    </script>
 </head>
 
 <body class="w-full h-screen relative">
@@ -108,7 +156,6 @@
                 $('#supplier_name').text(batch)
                 var url = "{{ route('supplier_name', ['name' => ':name']) }}"
                 url = url.replace(':name', batch)
-                alert(url)
 
                 $.ajax({
                     url: url,
@@ -129,7 +176,7 @@
                             });
 
                             var orderButton = `
-                            <label class="w-full flex items-center gap-4 py-3">
+                            <label class="w-full flex items-center gap-4 py-3 order-row">
                                 <input class="" type="checkbox" id="checkbox" name="id" value="${order.id}">
                                 <p class="w-[30%]">${order.item}</p>
                                 <p class="w-[15%]">${order.quantity}pcs</p>
@@ -193,7 +240,8 @@
 
     // Check if any checkboxes are selected
     if (orders.length === 0) {
-        alert('No items selected');
+        // alert('No items selected');
+        showNoItemsSelectedPopup();
         return;
     }
 
@@ -233,6 +281,63 @@
 
 
         })
+
+        // Function to check for expired products in the order list
+        function checkExpiredProducts() {
+            let hasExpired = false;
+            // Assuming each order row has a data-expiration attribute or a cell with class 'expiration-date'
+            document.querySelectorAll('.order-row').forEach(function(row) {
+                // You may need to adjust selector/class based on your markup
+                let expCell = row.querySelector('.expiration-date');
+                if (expCell) {
+                    let expDateStr = expCell.dataset.expiration || expCell.textContent.trim();
+                    if (expDateStr && expDateStr !== 'No expiration date') {
+                        let expDate = new Date(expDateStr);
+                        let now = new Date();
+                        // Set time to 00:00:00 for both to compare only the date
+                        expDate.setHours(0,0,0,0);
+                        now.setHours(0,0,0,0);
+                        if (expDate < now) {
+                            hasExpired = true;
+                        }
+                    }
+                }
+            });
+            if (hasExpired) {
+                Swal.fire({
+                    title: "Expired Product!",
+                    text: "One or more products in your order are expired.",
+                    icon: "warning",
+                    confirmButtonColor: "#d33"
+                });
+            }
+        }
+
+        // Call this function after the order list is rendered or updated
+        document.addEventListener('DOMContentLoaded', function() {
+            checkExpiredProducts();
+        });
+
+        // If you have dynamic updates to the order list, call checkExpiredProducts() after update as well
+
+    </script>
+    <script>
+        function showCheckItemPopup() {
+    Swal.fire({
+        title: 'Please Check the Item!',
+        html: '<div style="font-size:1.1em;color:#e5231a;"><i class="fa fa-exclamation-triangle" style="font-size:2em;color:#f59e42;"></i><br><br>Before proceeding, kindly review and check the item details.</div>',
+        icon: 'info',
+        confirmButtonText: 'Okay, I will check',
+        confirmButtonColor: '#f59e42',
+        background: '#fffbe6',
+        customClass: {
+            popup: 'shadow-lg rounded-xl border-2 border-[#f59e42]'
+        }
+    });
+}
+
+// Example usage: Call this function when the order is not checked
+// showCheckItemPopup();
     </script>
 </body>
 

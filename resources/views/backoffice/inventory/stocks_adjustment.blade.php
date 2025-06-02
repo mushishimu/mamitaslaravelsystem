@@ -12,7 +12,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
-<body class="w-full h-auto bg-[#fefefe] relative">
+<body class="w-full h-auto bg-gradient-to-br from-[#f8fafc] via-[#e0e7ef] to-[#c7d2fe] relative">
     <style>
         /* Add this to your existing CSS */
         .body-blur {
@@ -34,10 +34,16 @@
             z-index: 10;
             pointer-events: none;
         }
+
+        body {
+            /* Soft blue gradient background for less eye strain */
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 60%, #c7d2fe 100%);
+        }
     </style>
     {{-- modal pending items --}}
     <dialog id="stockModal" open
-        class="container fixed inset-0 z-10 bg-[#DEDEDE] pt-[50px] pb-[100px] max-h-[90vh] overflow-y-auto hidden">
+        class="container fixed inset-0 z-10 bg-[#fff7e6] pt-[50px] pb-[100px] max-h-[90vh] overflow-y-auto hidden">
+        <!-- Changed bg-[#DEDEDE] to bg-[#fff7e6] for a warm, soft background -->
         <button id="closeModal" class="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-gray-900 p-5"
             aria-label="closeModal">
             ✖
@@ -63,49 +69,61 @@
             </div>
             <div class="relative overflow-x-auto w-full">
                 <table class="w-full text-sm text-left text-gray-500">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                    <thead class="text-xs text-gray-700 uppercase" style="background-color: #ffe6a7;">
+                        <!-- Changed bg-gray-50 to a soft yellow #ffe6a7 -->
                         <tr>
                             <th scope="col" class="px-6 py-3">Product Name</th>
                             <th scope="col" class="px-6 py-3">Status</th>
                             <th scope="col" class="px-6 py-3">Stocks</th>
                             <th scope="col" class="px-6 py-3">Expiration Date</th>
-
+                            <th scope="col" class="px-6 py-3">Action</th> <!-- Add Action column -->
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="max-h-[calc(90vh-200px)] overflow-y-auto">
-                        @foreach ($stocks_alert as $stock)
-                            <tr class="bg-white border-b border-gray-200" data-name="{{ strtolower($stock->item) }}"
-                                data-quantity="{{ $stock->quantity }}">
-                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                    {{ $stock->item }}
-                                </th>
-                                <td class="px-6 py-4">
-                                    @if ($stock->quantity == 0)
-                                        <span class="text-red-600 font-bold">No Stock</span><br>
-                                        {{ $stock->name }} is only {{ $stock->quantity }} remaining in stock.
-                                    @elseif($stock->quantity <= 5)
-                                        <span class="text-orange-500 font-bold">Critically Low Stock</span><br>
-                                        {{ $stock->name }} has only {{ $stock->quantity }} left.
-                                    @elseif($stock->quantity <= 10)
-                                        <span class="text-orange-500 font-bold">Low Stock</span><br>
-                                        {{ $stock->name }} has only {{ $stock->quantity }} left.
-                                    @elseif($stock->quantity <= 20)
-                                        <span class="text-yellow-500 font-bold">Running Low</span><br>
-                                        {{ $stock->name }} is getting low with {{ $stock->quantity }} in stock.
-                                    @else
-                                        <span class="text-green-600 font-bold">In Stock</span><br>
-                                        {{ $stock->name }} has {{ $stock->quantity }} available.
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4">
-                                    {{ $stock->quantity }}
-                                </td>
-                                <td class="px-6 py-4 expiration-date" data-expiration="{{ $stock->expiration_date }}">
-                                    <!-- Placeholder for expiration date -->
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
+                    <tbody id="tableBody" class="max-h-[calc(90vh-200px)] overflow-y-auto" style="background-color: #fffbe6;">
+        <!-- Added style for a matching light background -->
+        @foreach ($stocks_alert as $stock)
+            <tr class="bg-white border-b border-gray-200" data-name="{{ strtolower($stock->item) }}"
+                data-quantity="{{ $stock->quantity }}">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {{ $stock->item }}
+                </th>
+                <td class="px-6 py-4">
+                    @if ($stock->quantity == 0)
+                        <span class="text-red-600 font-bold">No Stock</span><br>
+                        {{ $stock->name }} is only {{ $stock->quantity }} remaining in stock.
+                    @elseif($stock->quantity <= 5)
+                        <span class="text-orange-500 font-bold">Critically Low Stock</span><br>
+                        {{ $stock->name }} has only {{ $stock->quantity }} left.
+                    @elseif($stock->quantity <= 10)
+                        <span class="text-orange-500 font-bold">Low Stock</span><br>
+                        {{ $stock->name }} has only {{ $stock->quantity }} left.
+                    @elseif($stock->quantity <= 20)
+                        <span class="text-yellow-500 font-bold">Running Low</span><br>
+                        {{ $stock->name }} is getting low with {{ $stock->quantity }} in stock.
+                    @else
+                        <span class="text-green-600 font-bold">In Stock</span><br>
+                        {{ $stock->name }} has {{ $stock->quantity }} available.
+                    @endif
+                </td>
+                <td class="px-6 py-4">
+                    {{ $stock->quantity }}
+                </td>
+                <td class="px-6 py-4 expiration-date" data-expiration="{{ $stock->expiration_date }}">
+                    <!-- Placeholder for expiration date -->
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex flex-col gap-2">
+                        <a href="{{ url('/back-office/ordering?orderitem=' . urlencode($stock->item)) }}">
+                            <button type="button" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-semibold w-full mb-1">
+                                Order to Supplier
+                            </button>
+                        </a>
+                        {{-- Adjust Stock button removed as requested --}}
+                    </div>
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
                 </table>
             </div>
         </div>
@@ -636,10 +654,26 @@
         $('#adjustmentForm').submit(function(e) {
             e.preventDefault();
 
+            // Validate manufacturing and expiration dates
+            const mfg = $('input[name="manufacturing_date"]').val();
+            const exp = $('input[name="expiration_date"]').val();
+
+            if (mfg && exp) {
+                const mfgDate = new Date(mfg);
+                const expDate = new Date(exp);
+
+                if (mfgDate >= expDate) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Manufacturing date must be earlier than expiration date.',
+                        icon: 'error'
+                    });
+                    return false;
+                }
+            }
+
             // Get the form data
             let formData = $(this).serializeArray();
-
-            // Add CSRF token
             formData.push({
                 name: '_token',
                 value: $('meta[name="csrf-token"]').attr('content')
@@ -673,7 +707,7 @@
                             text: response.message || 'Stock has been adjusted successfully',
                             icon: 'success'
                         }).then(() => {
-                            location.reload();
+                            window.location.href = "{{ route('office.stocks_adjustment') }}";
                         });
                     } else {
                         Swal.fire({

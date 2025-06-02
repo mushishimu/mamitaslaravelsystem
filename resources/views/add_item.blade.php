@@ -173,26 +173,35 @@
                                 </select>
                             </div>
                             <div class="w-1/2">
-                                <label for="item_barcode" class="text-gray-500">Barcode</label>
+                                <label class="text-gray-500">Barcode</label>
+                                <div class="flex gap-2">
+                                    <button type="button" id="no-barcode-btn"
+                                        class="px-3 py-1 rounded bg-gray-300 text-gray-700 text-xs">No Barcode</button>
+                                    <button type="button" id="have-barcode-btn"
+                                        class="px-3 py-1 rounded bg-blue-500 text-white text-xs">Have Barcode</button>
+                                </div>
                                 <input type="text" id="item_barcode" name="item_barcode"
-                                    class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
-                                    value="N/A" readonly>
+                                    class="w-full mt-2 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
+                                    value="" placeholder="Enter barcode here" readonly>
                             </div>
 
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
-                                    const barcodeOption = document.getElementById('barcode_option');
                                     const barcodeInput = document.getElementById('item_barcode');
+                                    const noBarcodeBtn = document.getElementById('no-barcode-btn');
+                                    const haveBarcodeBtn = document.getElementById('have-barcode-btn');
 
-                                    barcodeOption.addEventListener('change', function () {
-                                        if (this.value === 'no') {
-                                            barcodeInput.value = 'N/A';
-                                            barcodeInput.readOnly = true;
-                                        } else {
-                                            barcodeInput.value = '';
-                                            barcodeInput.readOnly = false;
-                                            barcodeInput.focus();
-                                        }
+                                    noBarcodeBtn.addEventListener('click', function () {
+                                        barcodeInput.value = 'N/A';
+                                        barcodeInput.readOnly = true;
+                                        barcodeInput.placeholder = 'No barcode required';
+                                    });
+
+                                    haveBarcodeBtn.addEventListener('click', function () {
+                                        barcodeInput.value = '';
+                                        barcodeInput.readOnly = false;
+                                        barcodeInput.placeholder = 'Enter barcode here';
+                                        barcodeInput.focus();
                                     });
                                 });
                             </script>

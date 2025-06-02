@@ -201,7 +201,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="w-full flex items-center justify-between gap-5">
+                        <div class="w-full flex items-center justify-between gap-5 mb-10">
                             <div class="w-1/2">
                                 <label for="" class="text-gray-500">Product unit</label>
                                 <select name="product_unit"
@@ -217,11 +217,45 @@
                             </div>
                             <div class="w-1/2">
                                 <label for="item_barcode" class="text-gray-500">Barcode</label>
+                                <div class="flex gap-2 mb-2">
+                                    <button type="button" id="no-barcode-btn"
+                                        class="px-3 py-1 rounded bg-gray-300 text-gray-700 text-xs">No Barcode</button>
+                                    <button type="button" id="have-barcode-btn"
+                                        class="px-3 py-1 rounded bg-blue-500 text-white text-xs">Have Barcode</button>
+                                </div>
+                                <input type="hidden" id="barcode_option" name="barcode_option" value="no">
                                 <input type="text" id="item_barcode" name="item_barcode"
                                     class="w-full mt-1 px-2 py-1 outline-none border-b-2 bg-slate-50 border-[#eaeaea] focus:border-b-2 focus:border-main"
-                                    value="">
+                                    value="N/A" placeholder="Enter barcode here" readonly>
                             </div>
                         </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const barcodeInput = document.getElementById('item_barcode');
+                                const noBarcodeBtn = document.getElementById('no-barcode-btn');
+                                const haveBarcodeBtn = document.getElementById('have-barcode-btn');
+                                const barcodeOption = document.getElementById('barcode_option');
+
+                                barcodeInput.value = 'N/A';
+                                barcodeInput.readOnly = true;
+                                barcodeInput.placeholder = 'No barcode required';
+
+                                noBarcodeBtn.addEventListener('click', function () {
+                                    barcodeInput.value = 'N/A';
+                                    barcodeInput.readOnly = true;
+                                    barcodeInput.placeholder = 'No barcode required';
+                                    barcodeOption.value = 'no';
+                                });
+
+                                haveBarcodeBtn.addEventListener('click', function () {
+                                    barcodeInput.value = '';
+                                    barcodeInput.readOnly = false;
+                                    barcodeInput.placeholder = 'Enter barcode here';
+                                    barcodeInput.focus();
+                                    barcodeOption.value = 'yes';
+                                });
+                            });
+                        </script>
                     </div>
                     <div class=" bg-white rounded-md p-10">
                         <div class="w-full flex items-center justify-between gap-16 mb-10">
@@ -305,34 +339,54 @@
             if (errorMessages.length > 0) {
                 Swal.fire({
                     title: "Error!",
-                    html: errorMessages.join("<br>"), // line break for each error
+                    html: errorMessages.join("<br>"),
                     icon: "error",
                     confirmButtonColor: "#d33",
                 });
                 return;
             }
 
-            // Show success alert and then submit the form
+            // Show success alert and then redirect to item list after form submit
             Swal.fire({
                 title: "Success!",
                 text: "Your item has been added successfully.",
                 icon: "success",
                 confirmButtonColor: "#3085d6",
+                timer: 1200,
+                showConfirmButton: false
             }).then(() => {
                 document.getElementById('itemForm').submit();
             });
         });
 
-        // Prevent Enter key submission on QR input
-        document.addEventListener('DOMContentLoaded', function() {
-            const qrInput = document.querySelector('input[name="item_qr"]');
-            if (qrInput) {
-                qrInput.addEventListener('keydown', function(event) {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                    }
-                });
-            }
+        // Redirect to item list after successful creation (on page load, if session has 'success')
+        @if (session('success'))
+            window.location.href = "{{ route('office.items_list') }}";
+        @endif
+
+        // Barcode button scripts...
+        document.addEventListener('DOMContentLoaded', function () {
+            const barcodeInput = document.getElementById('item_barcode');
+            const noBarcodeBtn = document.getElementById('no-barcode-btn');
+            const haveBarcodeBtn = document.getElementById('have-barcode-btn');
+
+            // Default: No Barcode selected, input is readonly and value is 'N/A'
+            barcodeInput.value = 'N/A';
+            barcodeInput.readOnly = true;
+            barcodeInput.placeholder = 'No barcode required';
+
+            noBarcodeBtn.addEventListener('click', function () {
+                barcodeInput.value = 'N/A';
+                barcodeInput.readOnly = true;
+                barcodeInput.placeholder = 'No barcode required';
+            });
+
+            haveBarcodeBtn.addEventListener('click', function () {
+                barcodeInput.value = '';
+                barcodeInput.readOnly = false;
+                barcodeInput.placeholder = 'Enter barcode here';
+                barcodeInput.focus();
+            });
         });
 
         // Toggle functions
