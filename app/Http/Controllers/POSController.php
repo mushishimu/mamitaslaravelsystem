@@ -748,6 +748,7 @@ class POSController extends Controller
 
     public function searchBarcode(Request $request)
     {
+        \Log::info('Barcode search request:', $request->all());
         $barcode = $request->input('barcode');
         $item = \App\Models\Menu::where('barcode', $barcode)->first();
 
